@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="79" height="123" version="1.1" viewBox="0 0 79 123" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <path id="e" d="m78.25 117.25c0 2.762-2.238 5-5 5h-67.5c-2.761 0-5-2.238-5-5v-111.5c0-2.762 2.239-5 5-5h67.5c2.762 0 5 2.238 5 5z" fill="#fff" stroke="#000" stroke-width="1.5"/>
+  <path id="c" d="m3.529-5.011c-2.117-2.864-3.529-5.489-3.529-5.489s-1.412 2.625-3.529 5.489-4.471 5.011-4.471 5.011 2.353 2.147 4.471 5.012 3.529 5.488 3.529 5.488 1.412-2.625 3.529-5.488 4.471-5.012 4.471-5.012-2.353-2.148-4.471-5.011z" fill="#df0000"/>
+  <path id="h" d="m1.985-2.625c-1.191-1.5-1.985-2.875-1.985-2.875s-0.794 1.375-1.985 2.875-2.515 2.625-2.515 2.625 1.324 1.125 2.515 2.625 1.985 2.875 1.985 2.875 0.794-1.375 1.985-2.875 2.515-2.625 2.515-2.625-1.323-1.125-2.515-2.625z" fill="#df0000"/>
+  <g id="q" fill="none">
+   <path d="m327.25 5.25h-7v5.25l0.7 0.25s0.47-1.5 2.8-1.5 3.27 2.25 3.27 4.5-1.4 4-3.5 4-3.03-1.5-3.27-2.25"/>
+  </g>
+  <g id="ad" fill="none">
+   <path d="m383.75 117.75h7v-5.25l-0.7-0.25s-0.47 1.5-2.8 1.5-3.27-2.25-3.27-4.5 1.4-4 3.5-4 3.03 1.5 3.27 2.25"/>
+  </g>
+ </defs>
+ <use transform="translate(-316,-123)" x="316" y="123" xlink:href="#e"/>
+ <use transform="translate(-316,-123)" x="1" y="122.5" stroke="#df0000" xlink:href="#q"/>
+ <use transform="translate(-316,-123)" x="-1" y="123.5" stroke="#df0000" xlink:href="#ad"/>
+ <use transform="translate(8.5,24.5)" xlink:href="#h"/>
+ <use transform="translate(70.5,98.5)" xlink:href="#h"/>
+ <use transform="translate(23.5,21.5)" xlink:href="#c"/>
+ <use transform="translate(23.5,101.5)" xlink:href="#c"/>
+ <use transform="translate(39.5,61.5)" xlink:href="#c"/>
+ <use transform="translate(55.5,21.5)" xlink:href="#c"/>
+ <use transform="translate(55.5,101.5)" xlink:href="#c"/>
+</svg>

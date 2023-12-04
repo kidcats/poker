@@ -1,25 +1,24 @@
+// App.tsx
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import PokerCard from './poker';
+import Table from './table';
+import { GameProvider } from './gamerNum';
+import { RectangleProvider } from './rectangleContext';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <GameProvider>
+      <div className="App">
+        <div>
+          <h1>德州扑克</h1>
+          <RectangleProvider>
+            <Table />
+            <PokerCard />
+          </RectangleProvider>
+        </div>
+      </div>
+    </GameProvider>
   );
 }
 

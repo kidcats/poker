@@ -1,0 +1,46 @@
+/* styles.css */
+
+/* Container styling */
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* Card styling */
+.card {
+    width: 100px;
+    height: 150px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: transform 0.3s ease-in-out;
+}
+
+.card:hover {
+    transform: scale(1.1);
+}
+
+/* Card content styling */
+.card span {
+    font-size: 14px;
+}
+
+/* Suit colors */
+.card.hearts {
+    color: red;
+}
+
+.card.diamonds {
+    color: red;
+}
+
+.card.clubs {
+    color: black;
+}
+
+.card.spades {
+    color: black;
+}

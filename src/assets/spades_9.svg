@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="79" height="123" version="1.1" viewBox="0 0 79 123" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <path id="e" d="m78.25 117.25c0 2.762-2.238 5-5 5h-67.5c-2.761 0-5-2.238-5-5v-111.5c0-2.762 2.239-5 5-5h67.5c2.762 0 5 2.238 5 5z" fill="#fff" stroke="#000" stroke-width="1.5"/>
+  <path id="a" d="m7.989 3.103c-0.242-4.057-7.747-11.693-7.989-13.603-0.242 1.909-7.747 9.545-7.989 13.603-0.169 2.868 1.695 4.057 3.39 4.057 2.421 0 3.147-2.625 3.389-3.341 0-0.239 0.484-0.239 0.484 0 0.242 0.716-1.603 6.682-2.179 6.682h5.811c-0.576 0-2.421-5.966-2.179-6.682 0-0.239 0.485-0.239 0.485 0 0.242 0.716 0.968 3.341 3.389 3.341 1.694-1e-3 3.557-1.189 3.388-4.057z"/>
+  <path id="f" d="m4.494 1.625c-0.137-2.125-4.358-6.125-4.494-7.125-0.136 1-4.358 5-4.494 7.125-0.095 1.503 0.954 2.125 1.907 2.125 1.362 0 1.771-1.375 1.907-1.75 0-0.125 0.272-0.125 0.272 0 0.136 0.375-0.902 3.5-1.226 3.5h3.268c-0.323 0-1.361-3.125-1.226-3.5 0-0.125 0.273-0.125 0.273 0 0.136 0.375 0.544 1.75 1.906 1.75 0.954 0 2.002-0.622 1.907-2.125z"/>
+  <g id="m" fill="none">
+   <path d="m642.75 9v5.5s0.25 3.25-3.23 3.25c-1.08 0-2.8-0.5-3.02-2.25"/>
+   <path d="m642.75 9a3.25 3.25 0 1 0-6.5 0 3.25 3.25 0 1 0 6.5 0"/>
+  </g>
+  <g id="z" fill="none">
+   <path d="m706.75 114a3.25 3.25 0 1 0-6.5 0 3.25 3.25 0 1 0 6.5 0"/>
+   <path d="m700.25 114v-5.5s-0.25-3.25 3.23-3.25c1.08 0 2.8 0.5 3.02 2.25"/>
+  </g>
+ </defs>
+ <use transform="translate(-632,-369)" x="632" y="369" xlink:href="#e"/>
+ <use transform="translate(-632,-369)" x="1" y="368.5" stroke="#000000" xlink:href="#m"/>
+ <use transform="translate(-632,-369)" x="-1" y="369.5" stroke="#000000" xlink:href="#z"/>
+ <use transform="translate(8.5,24.5)" xlink:href="#f"/>
+ <use transform="rotate(180,35.25,49.25)" xlink:href="#f"/>
+ <use transform="translate(23.5,21.5)" xlink:href="#a"/>
+ <use transform="translate(23.5,48.25)" xlink:href="#a"/>
+ <use transform="rotate(180,11.75,37.375)" xlink:href="#a"/>
+ <use transform="rotate(180,11.75,50.75)" xlink:href="#a"/>
+ <use transform="translate(39.5,61.5)" xlink:href="#a"/>
+ <use transform="translate(55.5,21.5)" xlink:href="#a"/>
+ <use transform="translate(55.5,48.25)" xlink:href="#a"/>
+ <use transform="rotate(180,27.75,37.375)" xlink:href="#a"/>
+ <use transform="rotate(180,27.75,50.75)" xlink:href="#a"/>
+</svg>

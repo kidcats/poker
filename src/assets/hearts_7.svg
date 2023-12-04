@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="79" height="123" version="1.1" viewBox="0 0 79 123" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <path id="e" d="m78.25 117.25c0 2.762-2.238 5-5 5h-67.5c-2.761 0-5-2.238-5-5v-111.5c0-2.762 2.239-5 5-5h67.5c2.762 0 5 2.238 5 5z" fill="#fff" stroke="#000" stroke-width="1.5"/>
+  <path id="b" d="m3.676-9c-3.243 0-3.676 3.477-3.676 3.477s-0.433-3.477-3.676-3.477c-2.27 0-4.324 1.559-4.324 4.5 0 3.886 7.191 10.689 8 13.5 0.813-2.814 8-9.614 8-13.5 0-2.941-2.054-4.5-4.324-4.5z" fill="#df0000"/>
+  <path id="g" d="m2.067-5c-1.824 0-2.067 1.932-2.067 1.932s-0.243-1.932-2.067-1.932c-1.277 0-2.433 0.866-2.433 2.5 0 2.159 4.045 5.938 4.5 7.5 0.458-1.563 4.5-5.341 4.5-7.5 0-1.634-1.155-2.5-2.433-2.5z" fill="#df0000"/>
+  <g id="o" fill="none">
+   <path d="m477.75 7.5v-2.25h6.5l0.75 0.75c-2.25 2.75-4.25 7.75-4.25 12.5"/>
+  </g>
+  <g id="ab" fill="none">
+   <path d="m549.25 115.5v2.25h-6.5l-0.75-0.75c2.25-2.75 4.25-7.75 4.25-12.5"/>
+  </g>
+ </defs>
+ <use transform="translate(-474,-246)" x="474" y="246" xlink:href="#e"/>
+ <use transform="translate(-474,-246)" x="1" y="245.5" stroke="#df0000" xlink:href="#o"/>
+ <use transform="translate(-474,-246)" x="-1" y="246.5" stroke="#df0000" xlink:href="#ab"/>
+ <use transform="translate(8.5,24.5)" xlink:href="#g"/>
+ <use transform="rotate(180,35.25,49.25)" xlink:href="#g"/>
+ <use transform="translate(23.5,21.5)" xlink:href="#b"/>
+ <use transform="translate(23.5,61.5)" xlink:href="#b"/>
+ <use transform="rotate(180,11.75,50.75)" xlink:href="#b"/>
+ <use transform="translate(39.5,41.5)" xlink:href="#b"/>
+ <use transform="translate(55.5,21.5)" xlink:href="#b"/>
+ <use transform="translate(55.5,61.5)" xlink:href="#b"/>
+ <use transform="rotate(180,27.75,50.75)" xlink:href="#b"/>
+</svg>
