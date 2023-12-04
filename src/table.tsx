@@ -11,8 +11,12 @@ const Table: React.FC = () => {
             const tableElement = tableRef.current;
 
             if (tableElement) {
-                const { width, height, top, left } = tableElement.getBoundingClientRect();
-                setRectangle({ x:top,y:left,width, height });
+                const prob = tableElement.getBoundingClientRect();
+                const x = prob.x;
+                const y = prob.y;
+                const width = prob.width;
+                const height = prob.height;
+                setRectangle({ x,y,width, height });
             }
         };
 

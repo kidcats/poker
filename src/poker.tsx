@@ -33,14 +33,17 @@ const PokerCard: React.FC = () => {
     return newDeck;
   }
 
+
+  const { playerCount, setPlayerCount } = useGameContext();
+  const { rectangle, setRectangle } = useRectangleContext();
+
   const handleCardClick = (index: number) => {
     const newDeck = [...deck];
     newDeck[index].flipped = !newDeck[index].flipped;
     setDeck(newDeck);
+    console.log("playerCount:%s", playerCount);
+    console.log("x:%s,y:%s,w:%s,h:%s", rectangle.x, rectangle.y, rectangle.width, rectangle.height);
   };
-
-  const { playerCount, setPlayerCount } = useGameContext();
-  const { rectangle, setRectangle } = useRectangleContext();
 
   const scatterAnimation = useSpring({
     from: {
@@ -65,9 +68,9 @@ const PokerCard: React.FC = () => {
           key={index}
           onClick={() => handleCardClick(index)}
           style={{
-            ...scatterAnimation,
+            // ...scatterAnimation,
             ...cardStyle,
-            transform: `translate(${index * 0.8}px, ${index * 0.8}px)`,
+            transform: `translate(${index * 0.8}px, ${index * 1}px)`,
             zIndex: index,
           }}
         >

@@ -24,9 +24,9 @@ interface RectangleProviderProps {
 export const RectangleProvider: React.FC<RectangleProviderProps> = ({ children }) => {
   const [rectangle, setRectangle] = useState({
     x: 100,
-    y: 100,
-    width: 100,
-    height: 100,
+    y: 1000,
+    width: 1000,
+    height: 1000,
   });
 
   // 提供上下文的值
