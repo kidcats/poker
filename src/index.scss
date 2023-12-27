@@ -1,0 +1,32 @@
+@import './variables.scss';
+@import url('https://fonts.googleapis.com/css2?family=Alkatra&family=Poppins&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-padding-top: $scroll-padding-top;
+}
+
+body {
+  color: $carbon;
+  font-family: 'Poppins', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+a {
+  all: unset;
+  cursor: pointer;
+}
+
+button {
+  cursor: pointer;
+}

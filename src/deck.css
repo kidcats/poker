@@ -1,0 +1,15 @@
+
+
+.deck{
+    position: absolute;
+    cursor: pointer;
+}
+
+.card{
+    width: 150px;
+    height: 200px;
+    border: 1px solid white;
+    background-size: cover;
+    background-position: center;
+    border-radius: 8px;
+}

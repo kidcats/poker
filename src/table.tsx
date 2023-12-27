@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import './table.scss'
 import useRectangleContext from './rectangleContext';
 
 const Table: React.FC = () => {
@@ -31,6 +32,7 @@ const Table: React.FC = () => {
     }, []); // 依赖数组为空，表示只在组件挂载和卸载时执行
 
     return (
+        // <div className="game-page__table" >
         <div className="game-page__table" ref={tableRef}>
             <div className="table__rail"></div>
             <div className="table__felt"></div>

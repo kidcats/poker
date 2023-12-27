@@ -5,19 +5,21 @@ import PokerCard from './poker';
 import Table from './table';
 import { GameProvider } from './gamerNum';
 import { RectangleProvider } from './rectangleContext';
+import Deck from './deck';
 
 function App() {
   return (
     <GameProvider>
-      <div className="App">
-        <div>
-          <h1>德州扑克</h1>
-          <RectangleProvider>
+      <RectangleProvider>
+        <div className="App">
+          <div>
+            <h1>德州扑克</h1>
             <Table />
-            <PokerCard />
-          </RectangleProvider>
+            <Deck />
+          </div>
+
         </div>
-      </div>
+      </RectangleProvider>
     </GameProvider>
   );
 }
