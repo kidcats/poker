@@ -40,10 +40,6 @@ const to = (clicked: boolean): CardProps => ({
 
 const Deck: React.FC = () => {
     const [clickedIndices, setClickedIndices] = useState(Array(cards.length).fill(true)); 
-    //const [springs,api] = useSprings(cards.length, cards.map((_, index) => ({
-    //     ...from(),
-    //     ...to(clickedIndices[index]),
-    // })));
 
     const [springs,api] = useSprings(cards.length, index => ({
         ...from(),
@@ -66,17 +62,20 @@ const Deck: React.FC = () => {
 
     
     const handleCardClick = (index: number) => {
+        // 思路是先更新对应的点击标志位
+        setClickedIndices((prevClickedIndeces: Array<boolean>) => {
+            const newClickenIndices = new Array(...prevClickedIndeces);
+            if (newClickenIndices[index]) {
+                newClickenIndices[index] = false;
+            } else {
+                newClickenIndices[index] = true;
+            }
+            return newClickenIndices;
+        });
+        // 然后通过index和i的值来判断，是否需要执行动画
         api.start((i) => {
             if (index !== i) return;
-            setClickedIndices((prevClickedIndeces: Array<boolean>) => {
-                const newClickenIndices = new Array(...prevClickedIndeces);
-                if (newClickenIndices[index]) {
-                    newClickenIndices[index] = false;
-                } else {
-                    newClickenIndices[index] = true;
-                }
-                return newClickenIndices;
-            });
+            return to(clickedIndices[i])
         });
     }
     return <>
