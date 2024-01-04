@@ -1,6 +1,5 @@
 .card {
     position: absolute;
-<<<<<<< HEAD
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
@@ -13,12 +12,4 @@
 .card > img {
 
     box-sizing: border-box;
-=======
-    cursor: pointer;
-    width: 20%;
-    height: 30%;
-    animation: fadeIn;
-    animation-duration: 0.4s;
-    transition: width 1s ease;
->>>>>>> dev_air
 }
