@@ -12,12 +12,9 @@ function App() {
     <GameProvider>
       <RectangleProvider>
         <div className="App">
-          <div>
             <h1>德州扑克</h1>
-            <Table />
-            <Deck />
-          </div>
-
+            <Deck/>
+            <Table/>
         </div>
       </RectangleProvider>
     </GameProvider>
