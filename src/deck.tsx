@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { useSprings, animated, to } from '@react-spring/web';
+<<<<<<< HEAD
 import './deck.css';
+=======
+
+>>>>>>> dev_air
 
 const cards = [
     './assets/spades_A.svg',
@@ -35,9 +39,15 @@ const from = () => ({
 });
 
 const toNew = (clicked: boolean): CardProps => ({
+<<<<<<< HEAD
     x: clicked ? Math.random() * 400 - 200 : 0,
     y: clicked ? Math.random() * 40 - 20 : 0,
     rot: clicked ? Math.random() * 180 - 90 : 0,
+=======
+    x: clicked ? 0 : Math.random() * 400 - 200,
+    y: clicked ? 0 : Math.random() * 40 - 20,
+    rot: clicked ? 0 : Math.random() * 180 - 90,
+>>>>>>> dev_air
     scale: clicked ? 1.5 : 1,
     clicked,
 });
@@ -49,7 +59,13 @@ const Deck: React.FC = () => {
         ...from(),
         ...toNew(clickedIndices[index]),
     }));
+<<<<<<< HEAD
 
+=======
+    // 我现在知道为什么点击事件不靠谱了，因为deck的面积太大了，如果点击刀
+    // 两个deck之间重叠的部分，就会造成两个点击事件的冲突，所以现在首要的目标就是将
+    // animated.div的面积缩小，然后将点击事件绑定到img上面
+>>>>>>> dev_air
     const handleCardClick = (index: number) => {
         console.log('handleCardClick', index);
         // 思路是先更新对应的点击标志位
@@ -71,6 +87,7 @@ const Deck: React.FC = () => {
         });
     }
     return <>
+<<<<<<< HEAD
         {
             springs.map
                 (({ x, y, rot, scale }, i) => (
@@ -90,6 +107,20 @@ const Deck: React.FC = () => {
                 ))
         }
 
+=======
+        {springs.map(({ x, y, rot, scale }, i) => (
+            <div className="deck">
+            <animated.div
+                key={i}
+                style={{
+                    x, y,
+                    transform: to([rot, scale], (rot, scale) => `rotate(${rot}deg) scale(${scale})`),
+                }}>
+                <img src={getCardImage(i)} alt="card" onClick={() => handleCardClick(i)} />
+            </animated.div>
+            </div>
+            ))}
+>>>>>>> dev_air
     </>
 }
 
