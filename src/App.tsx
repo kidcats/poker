@@ -1,22 +1,23 @@
 // App.tsx
-import React from 'react';
+import { useRef } from 'react';
 import './App.css';
 import PokerCard from './poker';
 import Table from './table';
 import { GameProvider } from './gamerNum';
-import { RectangleProvider } from './rectangleContext';
+import { PositionProvider } from './positionContext';
 import Deck from './deck';
 
 function App() {
+  const tableRef = useRef<HTMLDivElement>(null);
   return (
     <GameProvider>
-      <RectangleProvider>
+      <PositionProvider>
         <div className="App">
             <h1>德州扑克</h1>
+            <Table ref={tableRef}></Table>
             <Deck/>
-            <Table/>
         </div>
-      </RectangleProvider>
+      </PositionProvider>
     </GameProvider>
   );
 }

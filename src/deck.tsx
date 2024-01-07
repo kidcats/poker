@@ -1,6 +1,7 @@
 import { useState,useEffect } from "react";
 import { useSprings, animated, to } from '@react-spring/web';
 import './deck.css';
+import { usePositionContext } from "./positionContext";
 
 const cards = [
     './assets/spades_A.svg',
@@ -45,6 +46,9 @@ const toNew = (clicked: boolean): CardProps => ({
 const Deck: React.FC = () => {
     const [clickedIndices, setClickedIndices] = useState(Array(cards.length).fill(false));
 
+    // 现在我要获取table的位置信息了
+    const position = usePositionContext();
+
     const [springs, api] = useSprings(cards.length, index => ({
         ...from(),
         ...toNew(clickedIndices[index]),
@@ -74,13 +78,17 @@ const Deck: React.FC = () => {
           return newClickedIndices;
         })
       
-      };
+    };
       
-      // 在组件渲染时操作状态
-      useEffect(() => {
-        // 这里拿到的是最新的状态
-        console.log('clickedIndices', clickedIndices); 
-      }, [clickedIndices]);
+    // 在组件渲染时操作状态
+    useEffect(() => {
+      // 这里拿到的是最新的状态
+      console.log('clickedIndices', clickedIndices); 
+      console.log('x', position?.x);
+      console.log('y', position?.y);
+      console.log('height', position?.height);
+      console.log('width', position?.width);
+    }, [clickedIndices]);
     return <>
         {
             springs.map

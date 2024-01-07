@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useSpring, animated } from '@react-spring/web';
+import { useSprings, animated } from '@react-spring/web';
 import './poker.css';
 import cardBack from './assets/bg.svg';
 import useGameContext from './gamerNum';
-import useRectangleContext from './rectangleContext';
+import { usePositionContext } from './positionContext';
 
 interface Card {
   suit: string;
@@ -36,12 +36,8 @@ const PokerCard: React.FC = () => {
   }
 
   const { playerCount, setPlayerCount } = useGameContext();
-  const { rectangle, setRectangle } = useRectangleContext();
 
   const handleCardClick = (index: number) => {
-    // const newDeck = [...deck];
-    // newDeck[index].flipped = !newDeck[index].flipped;
-    // setDeck(newDeck);
     setStartGame(true);
     console.log('startGame', startGame);
   };
@@ -58,49 +54,48 @@ const PokerCard: React.FC = () => {
     }
   },[startGame,playerCount])
 
-  // 现在要根据index来计算每个牌的位置了
-  // 首先要看有多少个玩家，然后根据玩家数量来计算每个牌的位置
-  const calculateCardPosition = (index: number) => {
-    console.log('game player ', playerCount);
-    // 不影响算，反正都是固定位置
-    const {x,y,width,height} = rectangle
-    console.log('x,y,width,height',x,y,width,height)
-    console.log('index',index)
-    //先考虑后面两个点的位置
-    if (index == 10) {
-      const cardX = x  + width / 2 - 50;
-      const cardY = y  - 50;
-      return { cardX, cardY };
-    }
-    if (index == 11) {
-      const cardX = x  + width / 2 - 50;
-      const cardY = y + height - 50;
-      return { cardX, cardY };
-    }
-    // 先考虑前10个点的位置
-    // 先算圆心位置
-    const prox = index % 5
-    const centerX = (width/2) 
-    const centerY = (width/2) 
-    // 先写出当前的圆公式 x = centerX + r*cosθ y = centerY + r*sinθ
-    const pointX = centerX + Math.cos(Math.PI*index/8) + (1-prox)*width/2
-    const pointY = centerY + Math.sin(Math.PI*index/8)
-    // 计算出对应的点后,需要根据index来计算出对应的位
-    // 
-    const cardX = pointX - 50;
-    const cardY = pointY - 50;
-    console.log('cardX,cardY',cardX,cardY)
-    return { cardX, cardY };
-  };
-  
-  const scatterAnimation = useSpring({
-    from: { transform: `translate(0%, 0%)` },
-    to: async (next, cancel) => {
-  
-      // 执行动画效果，将 cardX 和 cardY 作为参数传递给 next
-      // await next({ transform: `translate(${cardX}px, ${cardY}px)` });
-    },
-  });
+  // 计算位置，可以分为两组，一组在椭圆上，一组在矩形上
+// 首先是椭圆的，现在假设都以中心为远点
+// 0<= index < 6 的都在椭圆上
+// 方程为 如果 0<theta<pi/2 or 3pi/2<theta<2pi x = 0.4*w*cos(theta) + w/2 y = 0.8*h*sin(theta)
+// 如果 pi/2<theta<3pi/2 x = 0.4*w*cos(theta) - w/2 y = 0.8*h*sin(theta)
+// 如果 6<=index<9 说明都在矩形上边缘 对应的位置为 x = () y = h/2
+// 如果 9<=index<12 说明都在矩形下边缘 对应的位置为 x = () y = -h/2
+// 现在需要考虑，我要从哪里获取table的位置和宽度，我需要知道的是table的位置和宽度是随时变化的，所以我需要一个context来存储这些信息
+const calculatePosition = (index: number) => {
+  const x = 0;
+  const y = 0;
+  const width = 0;
+  const height = 0;
+  var cardX:number = 0;
+  var cardY:number = 0;
+  if (index < 2) {
+    const theta = Math.PI * (index+0) / 8;
+    cardX = 0.4 * width * Math.cos(theta) + width / 2;
+    cardY = 0.8 * height * Math.sin(theta);
+  }else if(index < 5){
+    const theta = Math.PI * (index+1) / 8;
+    cardX = 0.4 * width * Math.cos(theta) - width / 2;
+    cardY = 0.8 * height * Math.sin(theta);
+  }else if (index < 6){
+    const theta = Math.PI * (index+2) / 8;
+    cardX = 0.4 * width * Math.cos(theta) + width / 2;
+    cardY = 0.8 * height * Math.sin(theta);
+  }else if (index < 9) {
+    cardX = (index - 6) * width / 2;
+    cardY = height / 2;
+  }else if (index < 12) {
+    cardX = (index - 9) * width / 2;
+    cardY = -height / 2;
+  }else{
+    cardX = 0;
+    cardY = 0;
+  }
+  // 最后所有的结果都要还原到以文档左上角为原点的坐标系中
+  return { cardX: cardX + x, cardY: cardY + y };
+}
+
+
 
   const cardStyle: React.CSSProperties = {
     backgroundColor: 'black',
