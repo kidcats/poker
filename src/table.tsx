@@ -1,22 +1,18 @@
-import React, { useEffect, useRef, forwardRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import './table.scss'
-import {usePositionContext} from './positionContext';
+import { PositionContext } from './positionContext';
 
-interface TableProps {
 
-}
 
-const Table = forwardRef<HTMLDivElement, TableProps>((prob, ref) => {
-    const tableRef = useRef<HTMLDivElement>(null);
-    const position = usePositionContext();
+const Table = () => {
 
     return (
-        <div className="game-page__table" ref={tableRef}>
+        <div className="game-page__table" id = "game-table">
             <div className="table__rail"></div>
             <div className="table__felt"></div>
         </div>
     );
-});
+};
 
 export default Table;
 

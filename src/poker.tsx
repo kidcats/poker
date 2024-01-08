@@ -3,7 +3,7 @@ import { useSprings, animated } from '@react-spring/web';
 import './poker.css';
 import cardBack from './assets/bg.svg';
 import useGameContext from './gamerNum';
-import { usePositionContext } from './positionContext';
+import { usePosition } from './positionContext';
 
 interface Card {
   suit: string;

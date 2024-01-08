@@ -13,9 +13,9 @@ function App() {
     <GameProvider>
       <PositionProvider>
         <div className="App">
-            <h1>德州扑克</h1>
-            <Table ref={tableRef}></Table>
-            <Deck/>
+          <h1>德州扑克</h1>
+          <Table ></Table>
+          <Deck />
         </div>
       </PositionProvider>
     </GameProvider>

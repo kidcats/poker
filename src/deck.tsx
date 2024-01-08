@@ -1,7 +1,7 @@
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSprings, animated, to } from '@react-spring/web';
 import './deck.css';
-import { usePositionContext } from "./positionContext";
+import { usePosition } from "./positionContext";
 
 const cards = [
     './assets/spades_A.svg',
@@ -47,7 +47,7 @@ const Deck: React.FC = () => {
     const [clickedIndices, setClickedIndices] = useState(Array(cards.length).fill(false));
 
     // 现在我要获取table的位置信息了
-    const position = usePositionContext();
+    const position = usePosition().position;
 
     const [springs, api] = useSprings(cards.length, index => ({
         ...from(),
@@ -56,38 +56,38 @@ const Deck: React.FC = () => {
     // 我现在知道为什么点击事件不靠谱了，因为deck的面积太大了，如果点击刀
     // 两个deck之间重叠的部分，就会造成两个点击事件的冲突，所以现在首要的目标就是将
     // animated.div的面积缩小，然后将点击事件绑定到img上面
-    const handleCardClick = (index:number) => {
+    const handleCardClick = (index: number) => {
 
         setClickedIndices(prev => {
-          // 更新点击状态
-          const newClickedIndices = [...prev];
-          newClickedIndices[index] = !newClickedIndices[index];
-          return newClickedIndices;
+            // 更新点击状态
+            const newClickedIndices = [...prev];
+            newClickedIndices[index] = !newClickedIndices[index];
+            return newClickedIndices;
         });
-      
+
         // 在setState的回调函数中处理后续逻辑
         // 这里可以获取到更新后的状态
         setClickedIndices(prev => {
-          const newClickedIndices = [...prev];
-          
-          api.start(i => {
-            if(index !== i) return;
-            return toNew(newClickedIndices[i]); 
-          });
-      
-          return newClickedIndices;
+            const newClickedIndices = [...prev];
+
+            api.start(i => {
+                if (index !== i) return;
+                return toNew(newClickedIndices[i]);
+            });
+
+            return newClickedIndices;
         })
-      
+
     };
-      
+
     // 在组件渲染时操作状态
     useEffect(() => {
-      // 这里拿到的是最新的状态
-      console.log('clickedIndices', clickedIndices); 
-      console.log('x', position?.x);
-      console.log('y', position?.y);
-      console.log('height', position?.height);
-      console.log('width', position?.width);
+        // 这里拿到的是最新的状态
+        console.log('clickedIndices', clickedIndices);
+        console.log('x', position?.x);
+        console.log('y', position?.y);
+        console.log('height', position?.height);
+        console.log('width', position?.width);
     }, [clickedIndices]);
     return <>
         {

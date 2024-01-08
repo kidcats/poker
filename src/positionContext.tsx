@@ -1,54 +1,86 @@
-import { useState, useEffect, useRef,createContext,useContext } from 'react';
+import { createContext, useState, useEffect, useRef, useContext } from 'react';
 
 interface Position {
   x: number;
   y: number;
   width: number;
-  height: number; 
+  height: number;
 }
 
-const PositionContext = createContext<Position | undefined>(undefined);
-
-export const usePosition = () => {
-  const [position, setPosition] = useState<Position>();
-
-  const elementRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleResize = () => {
-      const rect = elementRef.current!.getBoundingClientRect();
-      setPosition({
-        x: rect.x,
-        y: rect.y,
-        width: rect.width,
-        height: rect.height
-      });
-    };
-    
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    }
-  }, []);
-
-  return position;
+interface ContextValue {
+  position: Position | null;
+  updatePosition: (newPosition: Position) => void;
 }
+
+export const PositionContext = createContext<ContextValue | null>(null);
 
 interface PositionProviderProps {
   children: React.ReactNode;
 }
 
+
+type Func = (...args: any[]) => any; 
+
+const debounce = <T extends Func>(func: T, delay: number) => {
+
+  let timeoutId: NodeJS.Timeout;
+
+  return (...args: Parameters<T>) => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+
+    timeoutId = setTimeout(() => {
+      func(...args);
+    }, delay);
+  };
+}
+
 export const PositionProvider: React.FC<PositionProviderProps> = ({children}) => {
-  const position = usePosition();
+
+  const [position, setPosition] = useState<Position | null>(null);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const element = document.getElementById('game-table');
+      if (!element) return;
+
+      const rect = element.getBoundingClientRect();
+      setPosition({
+        x: rect.x,
+        y: rect.y,
+        width: rect.width,
+        height: rect.height  
+      });
+    };
+    
+    const debouncedResize = debounce(handleResize, 100);
+    window.addEventListener('resize', debouncedResize);
+
+    handleResize();
+
+    return () => {
+      window.removeEventListener('resize', debouncedResize);
+    };
+  }, []);
+
+  const updatePosition = (newPosition: Position) => {
+    setPosition(newPosition);
+  };
 
   return (
-    <PositionContext.Provider value={position}>
+    <PositionContext.Provider value={{position, updatePosition}}>
       {children}
-    </PositionContext.Provider>  
+    </PositionContext.Provider>
   );
-}
 
-export const usePositionContext = () => {
-  return useContext(PositionContext);
-}
+};
+
+export const usePosition = () => {
+  const context = useContext(PositionContext);
+  if (!context) throw Error('Missing context');
+  return context;
+};
+
+
+export default PositionProvider;
