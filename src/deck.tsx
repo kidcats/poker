@@ -1,7 +1,7 @@
-import { click } from "@testing-library/user-event/dist/click";
-import { useState } from "react";
-import { useSprings, animated, interpolate } from '@react-spring/web';
-
+import { useState, useEffect } from "react";
+import { useSprings, animated, to } from '@react-spring/web';
+import './deck.css';
+import { usePosition } from "./positionContext";
 
 const cards = [
     './assets/spades_A.svg',
@@ -22,76 +22,93 @@ interface CardProps {
     clicked: boolean;
 }
 
-const from = (): CardProps => ({
+const from = () => ({
     x: 0,
     y: 0,
     rot: 0,
-    scale: 1.5,
+    scale: 1,
     clicked: false,
+
+    // Add center positioning
+    left: '50%',
+    top: '50%',
+    transform: 'translate(-50%, -50%)'
 });
 
-const to = (clicked: boolean): CardProps => ({
-    x: clicked ? 0 : Math.random() * 400 - 200,
-    y: clicked ? 0 : Math.random() * 40 - 20,
-    rot: clicked ? 0 : Math.random() * 180 - 90,
+const toNew = (clicked: boolean): CardProps => ({
+    x: clicked ? Math.random() * 400 - 200 : 0,
+    y: clicked ? Math.random() * 40 - 20 : 0,
+    rot: clicked ? Math.random() * 180 - 90 : 0,
     scale: clicked ? 1.5 : 1,
     clicked,
 });
 
 const Deck: React.FC = () => {
-    const [clickedIndices, setClickedIndices] = useState(Array(cards.length).fill(true)); 
+    const [clickedIndices, setClickedIndices] = useState(Array(cards.length).fill(false));
 
-    const [springs,api] = useSprings(cards.length, index => ({
+    // 现在我要获取table的位置信息了
+    const position = usePosition().position;
+
+    const [springs, api] = useSprings(cards.length, index => ({
         ...from(),
-        ...to(clickedIndices[index]),
+        ...toNew(clickedIndices[index]),
     }));
-
-    // 首先要确定一件事，就是网页是时时刻刻刷新的，所以当时将一个的点击换成了false,会带着以前的false一起刷新
-    // 但是也不能让只让这一个点击的是true，如果这样就会让其他的自动复原，所以能不能想办法只刷新一个很重要
-    // 思考一下，现在的核心问题是，所有的都在刷新，所以我需要一个东西去记住刷新的index，然后在执行的时候进行对比判断
-    // 如果，我先看一下，别人是怎么实现的
-    // 首先他使用了一个东西解决的，一个set
-    // 然后usesprings同时带了两个参数，一个是length一个是i
-    // 最后在在点击的时候，如果没有添加进去，就在set中添加进去
-    // 然后利用api.start启动动画，i利用匿名函数捕获了一个i
-    // 然后判断index是否等于i，如果不等于直接返回
-    // 如果等于，再通过set获取当前的状态，
-    // 通过当前的状态分别设定不同的x,值
-    // 最后再通过当所有的set都设置完毕后，将他们返回原处
-    //
-
-    
+    // 我现在知道为什么点击事件不靠谱了，因为deck的面积太大了，如果点击刀
+    // 两个deck之间重叠的部分，就会造成两个点击事件的冲突，所以现在首要的目标就是将
+    // animated.div的面积缩小，然后将点击事件绑定到img上面
     const handleCardClick = (index: number) => {
-        // 思路是先更新对应的点击标志位
-        setClickedIndices((prevClickedIndeces: Array<boolean>) => {
-            const newClickenIndices = new Array(...prevClickedIndeces);
-            if (newClickenIndices[index]) {
-                newClickenIndices[index] = false;
-            } else {
-                newClickenIndices[index] = true;
-            }
-            return newClickenIndices;
+
+        setClickedIndices(prev => {
+            // 更新点击状态
+            const newClickedIndices = [...prev];
+            newClickedIndices[index] = !newClickedIndices[index];
+            return newClickedIndices;
         });
-        // 然后通过index和i的值来判断，是否需要执行动画
-        api.start((i) => {
-            if (index !== i) return;
-            return to(clickedIndices[i])
-        });
-    }
+
+        // 在setState的回调函数中处理后续逻辑
+        // 这里可以获取到更新后的状态
+        setClickedIndices(prev => {
+            const newClickedIndices = [...prev];
+
+            api.start(i => {
+                if (index !== i) return;
+                return toNew(newClickedIndices[i]);
+            });
+
+            return newClickedIndices;
+        })
+
+    };
+
+    // 在组件渲染时操作状态
+    useEffect(() => {
+        // 这里拿到的是最新的状态
+        console.log('clickedIndices', clickedIndices);
+        console.log('x', position?.x);
+        console.log('y', position?.y);
+        console.log('height', position?.height);
+        console.log('width', position?.width);
+    }, [clickedIndices]);
     return <>
-        {springs.map(({ x, y, rot, scale }, i) => (<animated.div
-            className={'deck ${clickedIndices[i] ? "clicked" : ""}'}
-            key={i}
-            style={{ x, y }}
-        >
-            <animated.div
-                className="card"
-                style={{
-                    transform: interpolate([rot, scale], (rot, scale) => `rotate(${rot}deg) scale(${scale})`),
-                }}>
-                <img src={getCardImage(i)} alt="card" onClick={() => handleCardClick(i)} />
-            </animated.div>
-        </animated.div>))}
+        {
+            springs.map
+                (({ x, y, rot, scale }, i) => (
+                    <animated.div
+                        className="card" key={i} onClick={() => handleCardClick(i)}
+                        style={{
+                            transform: to([rot, scale, x, y], (r, s, x, y) =>
+                                `translate(-50%, -50%) 
+                                rotate(${r}deg) 
+                                scale(${s})
+                                translate(${x}px, ${y}px)`
+                            )
+                        }}
+                    >
+                        <img src={getCardImage(i)} alt="card" />
+                    </animated.div>
+                ))
+        }
+
     </>
 }
 

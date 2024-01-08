@@ -1,15 +1,15 @@
-
-
-.deck{
+.card {
     position: absolute;
-    cursor: pointer;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 10%; /* 使用百分比 */
+    z-index: 1;
+    will-change: transform;
 }
 
-.card{
-    width: 150px;
-    height: 200px;
-    border: 1px solid white;
-    background-size: cover;
-    background-position: center;
-    border-radius: 8px;
+
+.card > img {
+
+    box-sizing: border-box;
 }
