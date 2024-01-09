@@ -63,10 +63,9 @@ const PokerCard: React.FC = () => {
 // 如果 9<=index<12 说明都在矩形下边缘 对应的位置为 x = () y = -h/2
 // 现在需要考虑，我要从哪里获取table的位置和宽度，我需要知道的是table的位置和宽度是随时变化的，所以我需要一个context来存储这些信息
 const calculatePosition = (index: number) => {
-  const x = 0;
-  const y = 0;
-  const width = 0;
-  const height = 0;
+  const position = usePosition().position;
+  if (!position) return;
+  const { x, y, width, height } = position;
   var cardX:number = 0;
   var cardY:number = 0;
   if (index < 2) {
