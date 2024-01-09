@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSprings, animated, to } from '@react-spring/web';
-import './deck.css';
+import './deck.scss';
 import { Position, usePosition } from "./positionContext";
 
 const cards = [

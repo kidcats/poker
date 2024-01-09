@@ -1,0 +1,28 @@
+@import 'variables.scss';
+@import "mixins.scss";
+
+.card {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    width: 5vm;
+    will-change: transform;
+
+    animation: fadeIn;
+    animation-duration: 0.4s;
+    transition: width 1s ease;
+
+    
+  @include for-desktop {
+    width: 5%;
+  }
+}
+
+
+.card > img {
+    width: 95%;
+    height: 95%;
+    box-sizing: border-box;
+}
