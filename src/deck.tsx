@@ -43,11 +43,11 @@ const from = () => ({
     transform: 'translate(-50%, -50%)'
 });
 
-const toNew = (clicked: boolean, cardX: number,cardY: number): CardProps => {
+const toNew = (clicked: boolean, cardX: number,cardY: number,rotate:number): CardProps => {
     return {
         x: clicked ? cardX : 0,
         y: clicked ? cardY : 0,
-        rot: clicked ? 0 : 0,
+        rot: clicked ? rotate : 0,
         scale: clicked ? 1 : 1,
         clicked
     };
@@ -67,29 +67,45 @@ const calculatePosition = (index: number,position:Position|null) => {
     console.log('position',position);
     if (!position) return;
     const { x, y, width, height } = position;
+    const pw =  80/2;
+    const ph = 120/2;
     var cardX:number = 0;
     var cardY:number = 0;
-    if (index < 2) {
-      const theta = Math.PI * (index+0) / 4;
-      cardX = 0.2 * width * Math.cos(theta) + width * 0.3;
-      cardY = -0.4 * height * Math.sin(theta);
-    }else if(index < 5){
-      const theta = Math.PI * (index+1) / 4;
-      cardX = 0.2 * width * Math.cos(theta) - (width * 0.3 );
-      cardY = -0.4 * height * Math.sin(theta);
-    }else if (index < 6){
-      const theta = Math.PI * (index+2) / 4;
-      cardX = 0.2 * width * Math.cos(theta) + width * 0.3;
-      cardY = -0.4 * height * Math.sin(theta);
-    }else if (index < 9) {
-      cardX = (index - 6) * (width * 0.2 ) - width * 0.2;
-      cardY = -height / 2;
-    }else if (index < 12) {
-      cardX = (index - 9) * (width * 0.2) - width * 0.2;
-      cardY = height / 2;
-    }else{
-      cardX = 0;
-      cardY = 0;
+    var rotate = 0;
+    const rotateV = 6;
+    if (index < 6){
+        var i = 0;
+        if(index > 1 && index < 5){
+            i = index + 1;
+        }else if(index == 5){
+            i = index + 2;
+        }else{
+            i = index + 0;
+        }
+        const theta = i * Math.PI / 4;
+        console.log(theta)
+        cardX = 0.2*width*Math.cos(theta)  - ph * Math.cos(theta);
+        cardY = 0.4 * height * Math.sin(theta) - ph * Math.sin(theta);
+        if (i <3 || i == 7){
+            cardX = cardX + 0.3*width;
+        }else{
+            cardX = cardX - 0.3*width;
+        }
+        rotate = 1/4 + i/8 + rotateV;
+    }else if (index == 6 || index == 9){
+        cardX = -0.3 * width + pw;
+        cardY = index == 6 ? -(height/2 - ph) : height/2  - ph;
+        rotate = rotateV;
+    }else if (index == 7 || index == 10){
+        cardX = 0;
+        cardY = index == 7 ? -(height/2 - ph):height/2  - ph;
+        rotate = rotate + rotateV;
+    }else if (index == 8 || index == 11){
+        cardX = 0.3 * width - pw;
+        cardY = index == 8 ? -(height/2 - ph) : height/2  - ph;
+        rotate = rotate + rotateV;
+    }else {
+        console.log("bad index",index);
     }
     // 最后所有的结果都要还原到以文档左上角为原点的坐标系中
     console.log('cardX',cardX + x);
@@ -99,7 +115,7 @@ const calculatePosition = (index: number,position:Position|null) => {
     console.log('width',width);
     console.log('height',height); 
     console.log('index',index);
-    return { cardX: cardX, cardY: cardY };
+    return { cardX: cardX, cardY: cardY,rotate:rotate };
   }
 
 const Deck: React.FC = () => {
@@ -108,9 +124,10 @@ const Deck: React.FC = () => {
     const position = usePosition().position;
     const x = 0;
     const y = 0;
+    const r = 0;
     const [springs, api] = useSprings(cards.length, index => ({
         ...from(),
-        ...toNew(clickedIndices[index],x,y),
+        ...toNew(clickedIndices[index],x,y,r),
     }));
     const handleCardClick = (index: number) => {
 
@@ -125,10 +142,10 @@ const Deck: React.FC = () => {
         // 这里可以获取到更新后的状态
         setClickedIndices(prev => {
             const newClickedIndices = [...prev];
-            const {cardX,cardY} = calculatePosition(index,position)!;
+            const {cardX,cardY,rotate} = calculatePosition(index,position)!;
             api.start(i => {
                 if (index !== i) return;
-                return toNew(newClickedIndices[i],cardX,cardY);
+                return toNew(newClickedIndices[i],cardX,cardY,rotate);
             });
 
             return newClickedIndices;
@@ -150,9 +167,9 @@ const Deck: React.FC = () => {
                         style={{
                             transform: to([rot, scale, x, y], (r, s, x, y) =>
                                 `translate(-50%, -50%) 
-                                rotate(${r}deg) 
-                                scale(${s})
-                                translate(${x}px, ${y}px)`
+                                translate(${x}px, ${y}px)
+                                rotate(${r}turn) 
+                                scale(${s})`
                             )
                         }}
                     >

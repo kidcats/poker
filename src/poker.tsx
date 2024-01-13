@@ -3,7 +3,6 @@ import { useSprings, animated } from '@react-spring/web';
 import './poker.css';
 import cardBack from './assets/bg.svg';
 import useGameContext from './gamerNum';
-import { usePosition } from './positionContext';
 
 interface Card {
   suit: string;
@@ -62,37 +61,6 @@ const PokerCard: React.FC = () => {
 // 如果 6<=index<9 说明都在矩形上边缘 对应的位置为 x = () y = h/2
 // 如果 9<=index<12 说明都在矩形下边缘 对应的位置为 x = () y = -h/2
 // 现在需要考虑，我要从哪里获取table的位置和宽度，我需要知道的是table的位置和宽度是随时变化的，所以我需要一个context来存储这些信息
-const calculatePosition = (index: number) => {
-  const position = usePosition().position;
-  if (!position) return;
-  const { x, y, width, height } = position;
-  var cardX:number = 0;
-  var cardY:number = 0;
-  if (index < 2) {
-    const theta = Math.PI * (index+0) / 8;
-    cardX = 0.4 * width * Math.cos(theta) + width / 2;
-    cardY = 0.8 * height * Math.sin(theta);
-  }else if(index < 5){
-    const theta = Math.PI * (index+1) / 8;
-    cardX = 0.4 * width * Math.cos(theta) - width / 2;
-    cardY = 0.8 * height * Math.sin(theta);
-  }else if (index < 6){
-    const theta = Math.PI * (index+2) / 8;
-    cardX = 0.4 * width * Math.cos(theta) + width / 2;
-    cardY = 0.8 * height * Math.sin(theta);
-  }else if (index < 9) {
-    cardX = (index - 6) * width / 2;
-    cardY = height / 2;
-  }else if (index < 12) {
-    cardX = (index - 9) * width / 2;
-    cardY = -height / 2;
-  }else{
-    cardX = 0;
-    cardY = 0;
-  }
-  // 最后所有的结果都要还原到以文档左上角为原点的坐标系中
-  return { cardX: cardX + x, cardY: cardY + y };
-}
 
 
 
