@@ -77,23 +77,23 @@ const calculatePosition = (index: number, position: Position | null) => {
         console.log(theta)
         cardX = 0.2 * width * Math.cos(theta) - ph * Math.cos(theta);
         cardY = 0.4 * height * Math.sin(theta) - ph * Math.sin(theta);
-        if (i < 3 || i == 7) {
+        if (i < 3 || i === 7) {
             cardX = cardX + 0.3 * width;
         } else {
             cardX = cardX - 0.3 * width;
         }
         rotate = 1 / 4 + i / 8 + rotateV;
-    } else if (index == 4 || index == 7) {
+    } else if (index === 4 || index === 7) {
         cardX = -0.3 * width + pw;
-        cardY = index == 4 ? -(height / 2 - ph) : height / 2 - ph;
+        cardY = index === 4 ? -(height / 2 - ph) : height / 2 - ph;
         rotate = rotateV;
-    } else if (index == 5 || index == 8) {
+    } else if (index === 5 || index === 8) {
         cardX = 0;
-        cardY = index == 5 ? -(height / 2 - ph) : height / 2 - ph;
+        cardY = index === 5 ? -(height / 2 - ph) : height / 2 - ph;
         rotate = rotate + rotateV;
-    } else if (index == 6 || index == 9) {
+    } else if (index === 6 || index === 9) {
         cardX = 0.3 * width - pw;
-        cardY = index == 6 ? -(height / 2 - ph) : height / 2 - ph;
+        cardY = index === 6 ? -(height / 2 - ph) : height / 2 - ph;
         rotate = rotate + rotateV;
     } else {
         console.log("bad index", index);

@@ -6,6 +6,7 @@ import Table from './table';
 import { GameProvider } from './gamerNum';
 import { PositionProvider } from './positionContext';
 import Deck from './deck';
+import PokerChip from './chip';
 
 function App() {
   const tableRef = useRef<HTMLDivElement>(null);
@@ -16,6 +17,7 @@ function App() {
           <h1>德州扑克</h1>
           <Table ></Table>
           <Deck />
+          <PokerChip value={100} />
         </div>
       </PositionProvider>
     </GameProvider>
