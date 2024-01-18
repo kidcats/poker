@@ -1,11 +1,18 @@
 import { useState, useEffect } from "react";
 import { useSprings, animated, to } from '@react-spring/web';
-import './deck.css';
+import './deck.scss';
 import { usePosition } from "./positionContext";
+import { calculatePosition } from "./utils"
 
 const cards = [
     './assets/spades_A.svg',
+    './assets/spades_A.svg',
+    './assets/spades_A.svg',
     './assets/hearts_A.svg',
+    './assets/hearts_A.svg',
+    './assets/hearts_A.svg',
+    './assets/diamonds_A.svg',
+    './assets/diamonds_A.svg',
     './assets/diamonds_A.svg',
     './assets/clubs_A.svg',
 ];
@@ -35,27 +42,30 @@ const from = () => ({
     transform: 'translate(-50%, -50%)'
 });
 
-const toNew = (clicked: boolean): CardProps => ({
-    x: clicked ? Math.random() * 400 - 200 : 0,
-    y: clicked ? Math.random() * 40 - 20 : 0,
-    rot: clicked ? Math.random() * 180 - 90 : 0,
-    scale: clicked ? 1.5 : 1,
-    clicked,
-});
+const toNew = (clicked: boolean, cardX: number, cardY: number, rotate: number): CardProps => {
+    return {
+        x: clicked ? cardX : 0,
+        y: clicked ? cardY : 0,
+        rot: clicked ? rotate : 0,
+        scale: clicked ? 1 : 1,
+        clicked
+    };
+};
+
+
+
 
 const Deck: React.FC = () => {
     const [clickedIndices, setClickedIndices] = useState(Array(cards.length).fill(false));
 
-    // 现在我要获取table的位置信息了
     const position = usePosition().position;
-
+    const x = 0;
+    const y = 0;
+    const r = 0;
     const [springs, api] = useSprings(cards.length, index => ({
         ...from(),
-        ...toNew(clickedIndices[index]),
+        ...toNew(clickedIndices[index], x, y, r),
     }));
-    // 我现在知道为什么点击事件不靠谱了，因为deck的面积太大了，如果点击刀
-    // 两个deck之间重叠的部分，就会造成两个点击事件的冲突，所以现在首要的目标就是将
-    // animated.div的面积缩小，然后将点击事件绑定到img上面
     const handleCardClick = (index: number) => {
 
         setClickedIndices(prev => {
@@ -69,10 +79,10 @@ const Deck: React.FC = () => {
         // 这里可以获取到更新后的状态
         setClickedIndices(prev => {
             const newClickedIndices = [...prev];
-
+            const { cardX, cardY, rotate } = calculatePosition(index, position)!;
             api.start(i => {
                 if (index !== i) return;
-                return toNew(newClickedIndices[i]);
+                return toNew(newClickedIndices[i], cardX, cardY, rotate);
             });
 
             return newClickedIndices;
@@ -84,10 +94,6 @@ const Deck: React.FC = () => {
     useEffect(() => {
         // 这里拿到的是最新的状态
         console.log('clickedIndices', clickedIndices);
-        console.log('x', position?.x);
-        console.log('y', position?.y);
-        console.log('height', position?.height);
-        console.log('width', position?.width);
     }, [clickedIndices]);
     return <>
         {
@@ -98,9 +104,9 @@ const Deck: React.FC = () => {
                         style={{
                             transform: to([rot, scale, x, y], (r, s, x, y) =>
                                 `translate(-50%, -50%) 
-                                rotate(${r}deg) 
-                                scale(${s})
-                                translate(${x}px, ${y}px)`
+                                translate(${x}px, ${y}px)
+                                rotate(${r}turn) 
+                                scale(${s})`
                             )
                         }}
                     >

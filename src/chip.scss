@@ -1,0 +1,139 @@
+// 筹码大小
+$chip-size: 50px; 
+
+// 筹码颜色
+$chip-colors: (
+  red: #ff0000,
+  green: #00ff00, 
+  black: #525151,
+  blue: #0000ff,
+  purple: #9900ff,
+  yellow: #ffff00,
+  orange: #ff6600,
+  pink: #ff1493 
+);
+
+// 筹码样式
+@mixin chip($color) {
+
+  // 圆形
+  width: $chip-size;
+  height: $chip-size;
+  border-radius: 40%;
+  position: absolute;
+  top: 70%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+
+  // 颜色
+  background-color: map-get($chip-colors, $color);
+
+  // 图案样式
+  &:before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: calc(100% - 10px);
+    height: calc(100% - 10px);
+    border: 2px dashed white;
+    border-radius: 50%;
+  }
+
+  // 数字样式
+  span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    font-size: 15px;
+    font-weight: bold;
+    color: black;
+  }
+
+  // 立体阴影
+  box-shadow: 
+    inset 0 0 5px rgba(0, 0, 0, 0.456),  // Top shadow
+    0 2px 4px rgba(0,0,0,.2),
+    inset 0 0 5px rgba(0, 0, 0, 0.3),  // Bottom shadow
+    0 2px 4px rgba(0,0,0,.2),
+    inset 0 0 5px rgba(0, 0, 0, 0.3),  // Left shadow
+    0 2px 4px rgba(0,0,0,.2),
+    inset 0 0 5px rgba(0, 0, 0, 0.3),  // Right shadow
+    0 2px 4px rgba(0,0,0,.2);
+  
+    
+
+
+  // 动画过渡
+  transition: .3s;
+
+}
+
+// 生成不同面额的筹码类
+.chip-1 {
+  @include chip(red);
+
+  span {
+    content: "1"; 
+  }
+}
+
+.chip-5 {
+  @include chip(green);
+  
+  span {
+    content: "5";
+  }
+}
+
+.chip-10 {
+  @include chip(black);
+
+  span {
+    content: "10";
+  } 
+}
+
+.chip-20 {
+  @include chip(blue);
+
+  span {
+    content: "20";
+  }
+}
+
+.chip-50 {
+  @include chip(purple);
+
+  span {
+    content: "50";
+  }
+}
+
+.chip-100 {
+  @include chip(yellow);
+
+  span {
+    content: "100"; 
+  }
+}
+
+.chip-500 {
+  @include chip(orange);
+
+  span {
+    content: "500";
+  }
+}
+
+.chip-1000 {
+  @include chip(pink);
+
+  span {
+    content: "1000";
+  }
+}

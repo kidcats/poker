@@ -1,6 +1,6 @@
-import { createContext, useState, useEffect, useRef, useContext } from 'react';
+import { createContext, useState, useEffect, useContext } from 'react';
 
-interface Position {
+export interface Position {
   x: number;
   y: number;
   width: number;
