@@ -5,7 +5,7 @@ $chip-size: 50px;
 $chip-colors: (
   red: #ff0000,
   green: #00ff00, 
-  black: #000000,
+  black: #525151,
   blue: #0000ff,
   purple: #9900ff,
   yellow: #ffff00,
@@ -21,8 +21,10 @@ $chip-colors: (
   height: $chip-size;
   border-radius: 40%;
   position: absolute;
-  top: 50%;
+  top: 70%;
   left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
 
   // 颜色
   background-color: map-get($chip-colors, $color);
@@ -31,8 +33,9 @@ $chip-colors: (
   &:before {
     content: "";
     position: absolute;
-    top: 5px; 
-    left: 5px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     width: calc(100% - 10px);
     height: calc(100% - 10px);
     border: 2px dashed white;
@@ -42,26 +45,31 @@ $chip-colors: (
   // 数字样式
   span {
     position: absolute;
-    bottom: 5px; 
-    width: 100%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     text-align: center;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: bold;
-    color: white;
+    color: black;
   }
 
   // 立体阴影
   box-shadow: 
-    inset 1px 5px 5px rgba(0,0,0,.3),
+    inset 0 0 5px rgba(0, 0, 0, 0.456),  // Top shadow
+    0 2px 4px rgba(0,0,0,.2),
+    inset 0 0 5px rgba(0, 0, 0, 0.3),  // Bottom shadow
+    0 2px 4px rgba(0,0,0,.2),
+    inset 0 0 5px rgba(0, 0, 0, 0.3),  // Left shadow
+    0 2px 4px rgba(0,0,0,.2),
+    inset 0 0 5px rgba(0, 0, 0, 0.3),  // Right shadow
     0 2px 4px rgba(0,0,0,.2);
+  
+    
+
 
   // 动画过渡
   transition: .3s;
-
-  // 悬停时略微浮起
-  &:hover {
-    transform: translate(-2px,-2px);
-  }
 
 }
 
