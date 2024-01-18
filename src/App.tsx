@@ -1,15 +1,18 @@
 // App.tsx
 import { useRef } from 'react';
 import './App.css';
-import PokerCard from './poker';
 import Table from './table';
 import { GameProvider } from './gamerNum';
 import { PositionProvider } from './positionContext';
 import Deck from './deck';
+
+import { useState } from 'react';
+import { useTransition } from 'react-spring';
+
 import PokerChip from './chip';
 
 function App() {
-  const tableRef = useRef<HTMLDivElement>(null);
+  
   return (
     <GameProvider>
       <PositionProvider>
@@ -17,7 +20,9 @@ function App() {
           <h1>德州扑克</h1>
           <Table ></Table>
           <Deck />
-          <PokerChip value={100} />
+          <div>
+          <PokerChip  value={1} />
+    </div>
         </div>
       </PositionProvider>
     </GameProvider>

@@ -1,45 +1,42 @@
-import React, { useState, useEffect } from 'react';
-import './chip.css';
-
-interface PokerChipProps {
+// PokerChip.tsx
+import React, { useState } from 'react';
+import { useSpring, animated } from 'react-spring';
+import './chip.scss';
+interface ChipProps {
   value: number;
+}  
+
+const PokerChip: React.FC<ChipProps> = (props) => {
+
+  const [animatedPosition, setAnimatedPosition] = useSpring(() => ({
+    x: 0,
+    y: 0
+  }));
+  
+  const handleDrag = (event: React.DragEvent<HTMLDivElement>) => {
+    setAnimatedPosition({ 
+      x: event.clientX,
+      y: event.clientY 
+    });
+  };
+  
+  return (
+    <animated.div
+      className={`chip-${props.value}`}  
+      style={{
+        position: 'absolute',
+        left: animatedPosition.x,
+        top: animatedPosition.y,
+        zIndex: 10
+      }}
+      draggable
+      onDrag={handleDrag}
+    >
+      <span>{props.value}</span>
+    
+    </animated.div>
+  );
 }
 
-const PokerChip: React.FC<PokerChipProps> = ({ value }) => {
-  const [chips, setChips] = useState(value);
-
-  useEffect(() => {
-    // Add animation effect when chips value changes
-    const chipElement = document.getElementById(`chip-${value}`);
-    if (chipElement) {
-      chipElement.classList.add('chip-animate');
-
-      // Remove animation class after the animation ends
-      const animationEndHandler = () => {
-        chipElement.classList.remove('chip-animate');
-        chipElement.removeEventListener('animationend', animationEndHandler);
-      };
-
-      chipElement.addEventListener('animationend', animationEndHandler);
-    }
-  }, [value]);
-
-  const addChips = (amount: number) => {
-    setChips(chips + amount);
-  };
-
-  const removeChips = (amount: number) => {
-    setChips(chips - amount);
-  };
-
-  return (
-    <div className="poker-chip" id={`chip-${value}`}>
-      <div className="chip-value">${value}</div>
-      <div className="chip-quantity">{chips}</div>
-      <button onClick={() => addChips(1)}>Add Chip</button>
-      <button onClick={() => removeChips(1)}>Remove Chip</button>
-    </div>
-  );
-};
 
 export default PokerChip;
