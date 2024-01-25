@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useSprings, animated, to } from '@react-spring/web';
 import './deck.scss';
 import { usePosition } from "./positionContext";
-import { calculatePosition } from "./utils"
+import { calculatePosition, calculateCenterPosition } from "./utils"
 
 const cards = [
     './assets/spades_A.svg',
@@ -15,6 +15,11 @@ const cards = [
     './assets/diamonds_A.svg',
     './assets/diamonds_A.svg',
     './assets/clubs_A.svg',
+    './assets/clubs_K.svg',
+    './assets/clubs_K.svg',
+    './assets/clubs_K.svg',
+    './assets/clubs_K.svg',
+    './assets/clubs_K.svg',
 ];
 
 const getCardImage = (i: number) => {
@@ -52,13 +57,26 @@ const toNew = (clicked: boolean, cardX: number, cardY: number, rotate: number): 
     };
 };
 
+const toPublic = (clicked: boolean, cardX: number, cardY: number, rotate: number): CardProps => {
+    return {
+        x: cardX ,
+        y: cardY ,
+        rot: rotate ,
+        scale: 1,
+        clicked
+    };
+}
 
+interface DeckProps {
+    round: number;
+    playerCount: number;
+}
 
-
-const Deck: React.FC = () => {
+const Deck: React.FC<DeckProps> = (props) => {
     const [clickedIndices, setClickedIndices] = useState(Array(cards.length).fill(false));
+    // 用于记录当前游戏的轮次
+    var round = props.round;
 
-    const position = usePosition().position;
     const x = 0;
     const y = 0;
     const r = 0;
@@ -66,6 +84,8 @@ const Deck: React.FC = () => {
         ...from(),
         ...toNew(clickedIndices[index], x, y, r),
     }));
+    // 现在点击的时候会根据Index来更新牌的位置，现在要改了
+    // 
     const handleCardClick = (index: number) => {
 
         setClickedIndices(prev => {
@@ -79,22 +99,51 @@ const Deck: React.FC = () => {
         // 这里可以获取到更新后的状态
         setClickedIndices(prev => {
             const newClickedIndices = [...prev];
+            if(index < 10){
             const { cardX, cardY, rotate } = calculatePosition(index, position)!;
             api.start(i => {
                 if (index !== i) return;
                 return toNew(newClickedIndices[i], cardX, cardY, rotate);
             });
-
+            }else{
+                const { cardX, cardY, rotate } = calculateCenterPosition(index-10)!;
+                api.start(i => {
+                    if (index !== i) return;
+                    return toPublic(newClickedIndices[i], cardX, cardY, rotate);
+                });
+            }
             return newClickedIndices;
         })
-
     };
 
+
+    const position = usePosition().position;
     // 在组件渲染时操作状态
     useEffect(() => {
         // 这里拿到的是最新的状态
+        // 首先根据当前的轮次判断这些牌要去哪里
+        console.log('position', position);
+        console.log('round', round);
+        // if (position) {
+        //     if (round === 1) {
+        //         // 说明是翻前，牌要去玩家的面前,话说我的index要怎么处理？
+        //         for (let i = 0; i < 10; i++) {
+        //             const { cardX, cardY, rotate } = calculatePosition(i, position)!;
+        //             api.start(i => {
+        //                 return toNew(clickedIndices[i], cardX, cardY, rotate);
+        //             });
+        //         }
+        //         /// 同时发5张背面的公共牌在牌桌上
+        //         for (let i = 10; i < 15; i++) {
+        //             const { cardX, cardY, rotate } = calculateCenterPosition(i-10)!;
+        //             api.start(i => {
+        //                 return toPublic(clickedIndices[i], cardX, cardY, rotate);
+        //             });
+        //         }
+        //     }
+        // }
         console.log('clickedIndices', clickedIndices);
-    }, [clickedIndices]);
+    }, [clickedIndices,round]);
     return <>
         {
             springs.map
@@ -117,5 +166,4 @@ const Deck: React.FC = () => {
 
     </>
 }
-
 export default Deck;
