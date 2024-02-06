@@ -16,10 +16,10 @@ const cards = [
     './assets/diamonds_A.svg',
     './assets/clubs_A.svg',
     './assets/clubs_K.svg',
-    './assets/clubs_K.svg',
-    './assets/clubs_K.svg',
-    './assets/clubs_K.svg',
-    './assets/clubs_K.svg',
+    './assets/clubs_Q.svg',
+    './assets/clubs_J.svg',
+    './assets/clubs_10.svg',
+    './assets/clubs_9.svg',
 ];
 
 const getCardImage = (i: number) => {
@@ -41,7 +41,7 @@ const from = () => ({
     scale: 1,
     clicked: false,
 
-    // Add center positioning
+    // Add center positioning   
     left: '50%',
     top: '50%',
     transform: 'translate(-50%, -50%)'
@@ -59,9 +59,9 @@ const toNew = (clicked: boolean, cardX: number, cardY: number, rotate: number): 
 
 const toPublic = (clicked: boolean, cardX: number, cardY: number, rotate: number): CardProps => {
     return {
-        x: cardX ,
-        y: cardY ,
-        rot: rotate ,
+        x: clicked ? cardX : 0,
+        y: clicked ? cardY : 0,
+        rot: clicked ? rotate : 0,
         scale: 1,
         clicked
     };
@@ -98,15 +98,15 @@ const Deck: React.FC<DeckProps> = (props) => {
         // 在setState的回调函数中处理后续逻辑
         // 这里可以获取到更新后的状态
         setClickedIndices(prev => {
-            const newClickedIndices = [...prev];
-            if(index < 10){
-            const { cardX, cardY, rotate } = calculatePosition(index, position)!;
-            api.start(i => {
-                if (index !== i) return;
-                return toNew(newClickedIndices[i], cardX, cardY, rotate);
-            });
-            }else{
-                const { cardX, cardY, rotate } = calculateCenterPosition(index-10)!;
+            const newClickedIndices = [...prev];// 这里获取当前的是否已经点击标志
+            if (index < 10) {  // 如果小于10说明是玩家手里的牌
+                const { cardX, cardY, rotate } = calculatePosition(index, position)!;
+                api.start(i => {
+                    if (index !== i) return;
+                    return toNew(newClickedIndices[i], cardX, cardY, rotate);
+                });
+            } else {
+                const { cardX, cardY, rotate } = calculateCenterPosition(index - 10)!;
                 api.start(i => {
                     if (index !== i) return;
                     return toPublic(newClickedIndices[i], cardX, cardY, rotate);
@@ -143,7 +143,7 @@ const Deck: React.FC<DeckProps> = (props) => {
         //     }
         // }
         console.log('clickedIndices', clickedIndices);
-    }, [clickedIndices,round]);
+    }, [clickedIndices, round]);
     return <>
         {
             springs.map

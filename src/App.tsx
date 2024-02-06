@@ -24,12 +24,12 @@ function App() {
         <div className="App">
           <h1>德州扑克</h1>
           <Table></Table>
-          <Deck round={round} playerCount={playerCount} ></Deck>
-          <PokerChip value={100} index = {0} />
-          <PokerChip value={1} index = {0} />
-          <PokerChip value={10} index = {0} />
-          <PokerChip value={50} index = {0} />
-          <PokerChip value={1000} index = {0} />
+          <Deck round={round} playerCount={playerCount}></Deck>
+          <PokerChip value={100} index={0} />
+          <PokerChip value={1} index={0} />
+          <PokerChip value={10} index={0} />
+          <PokerChip value={50} index={0} />
+          <PokerChip value={1000} index={0} />
         </div>
       </PositionProvider>
     </GameProvider>
