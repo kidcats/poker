@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useSprings, animated } from '@react-spring/web';
 import './poker.css';
 import cardBack from './assets/bg.svg';
-import useGameContext from './gamerNum';
 
 interface Card {
   suit: string;
@@ -34,8 +33,6 @@ const PokerCard: React.FC = () => {
     return newDeck;
   }
 
-  const { playerCount, setPlayerCount } = useGameContext();
-
   const handleCardClick = (index: number) => {
     setStartGame(true);
     console.log('startGame', startGame);
@@ -43,7 +40,7 @@ const PokerCard: React.FC = () => {
 
   // 用于在这里面更新牌的动画
   useEffect(() => {
-    if (startGame && playerCount > 2) {
+    if (startGame ) {
       const newDeck = [...deck];
       newDeck.forEach((card, index) => {
         card.flipped = true;
@@ -51,7 +48,7 @@ const PokerCard: React.FC = () => {
         cardRefs.current[index].setAttribute('style', `...scatterAnimation`);
       });
     }
-  },[startGame,playerCount])
+  },[startGame])
 
   // 计算位置，可以分为两组，一组在椭圆上，一组在矩形上
 // 首先是椭圆的，现在假设都以中心为远点

@@ -3,6 +3,9 @@ import { useSprings, animated, to } from '@react-spring/web';
 import './deck.scss';
 import { usePosition } from "./positionContext";
 import { calculatePosition, calculateCenterPosition } from "./utils"
+import { useDispatch, useSelector } from "react-redux";
+import { roundSelector } from "./gameRoundSlice";
+
 
 const cards = [
     './assets/spades_A.svg',
@@ -72,10 +75,15 @@ interface DeckProps {
     playerCount: number;
 }
 
+
 const Deck: React.FC<DeckProps> = (props) => {
     const [clickedIndices, setClickedIndices] = useState(Array(cards.length).fill(false));
     // 用于记录当前游戏的轮次
-    var round = props.round;
+    const gameRound = useSelector(roundSelector);
+    // 创建一个dispatch，用于发送action更新状态
+    const dispatch = useDispatch();
+
+
 
     const x = 0;
     const y = 0;
@@ -99,19 +107,19 @@ const Deck: React.FC<DeckProps> = (props) => {
         // 这里可以获取到更新后的状态
         setClickedIndices(prev => {
             const newClickedIndices = [...prev];// 这里获取当前的是否已经点击标志
-            if (index < 10) {  // 如果小于10说明是玩家手里的牌
-                const { cardX, cardY, rotate } = calculatePosition(index, position)!;
-                api.start(i => {
-                    if (index !== i) return;
-                    return toNew(newClickedIndices[i], cardX, cardY, rotate);
-                });
-            } else {
-                const { cardX, cardY, rotate } = calculateCenterPosition(index - 10)!;
-                api.start(i => {
-                    if (index !== i) return;
-                    return toPublic(newClickedIndices[i], cardX, cardY, rotate);
-                });
-            }
+            // if (index < 10) {  // 如果小于10说明是玩家手里的牌
+            //     const { cardX, cardY, rotate } = calculatePosition(index, position)!;
+            //     api.start(i => {
+            //         if (index !== i) return;
+            //         return toNew(newClickedIndices[i], cardX, cardY, rotate);
+            //     });
+            // } else {
+            //     const { cardX, cardY, rotate } = calculateCenterPosition(index - 10)!;
+            //     api.start(i => {
+            //         if (index !== i) return;
+            //         return toPublic(newClickedIndices[i], cardX, cardY, rotate);
+            //     });
+            // }
             return newClickedIndices;
         })
     };
@@ -123,27 +131,26 @@ const Deck: React.FC<DeckProps> = (props) => {
         // 这里拿到的是最新的状态
         // 首先根据当前的轮次判断这些牌要去哪里
         console.log('position', position);
-        console.log('round', round);
-        // if (position) {
-        //     if (round === 1) {
-        //         // 说明是翻前，牌要去玩家的面前,话说我的index要怎么处理？
-        //         for (let i = 0; i < 10; i++) {
-        //             const { cardX, cardY, rotate } = calculatePosition(i, position)!;
-        //             api.start(i => {
-        //                 return toNew(clickedIndices[i], cardX, cardY, rotate);
-        //             });
-        //         }
-        //         /// 同时发5张背面的公共牌在牌桌上
-        //         for (let i = 10; i < 15; i++) {
-        //             const { cardX, cardY, rotate } = calculateCenterPosition(i-10)!;
-        //             api.start(i => {
-        //                 return toPublic(clickedIndices[i], cardX, cardY, rotate);
-        //             });
-        //         }
-        //     }
-        // }
+        if (position) {
+            if (gameRound === 1) {
+                // 说明是翻前，牌要去玩家的面前,话说我的index要怎么处理？
+                for (let i = 0; i < 10; i++) {
+                    const { cardX, cardY, rotate } = calculatePosition(i, position)!;
+                    api.start(i => {
+                        return toNew(clickedIndices[i], cardX, cardY, rotate);
+                    });
+                }
+                /// 同时发5张背面的公共牌在牌桌上
+                for (let i = 10; i < 15; i++) {
+                    const { cardX, cardY, rotate } = calculateCenterPosition(i-10)!;
+                    api.start(i => {
+                        return toPublic(clickedIndices[i], cardX, cardY, rotate);
+                    });
+                }
+            }
+        }
         console.log('clickedIndices', clickedIndices);
-    }, [clickedIndices, round]);
+    }, [clickedIndices,gameRound]);
     return <>
         {
             springs.map

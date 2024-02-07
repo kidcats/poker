@@ -1,3 +1,31 @@
 现在动画都做完了吗？
 并没有，我现在要做什么
 需要通过上级的控制游戏的轮次，然后根据轮次改变扑克牌的状态
+
+
+
+现在学一下redux，因为感觉这个有点用
+createstore 创建一个存储实例？有什么用？怎么创建？使用场景是什么？
+combineReducers 用来合并reducer的，有什么用？怎么使用？使用场景是什么？什么是reducer？
+applyMiddleware 用来处理中间件的，将多个中间件合并为一个store增强器，有什么用？怎么使用？使用场景是什么？什么是中间件？
+compose将多个增强器合并为一个单一的store增强器，有什么用为什么要合并？怎么使用？使用场景是什么？ 
+
+现在可以使用redux了，两个重要的api
+configureStore 通过单个函数调用设置一个默认的redux store。
+ 1. slice reducers 自动传递给combineReducers
+ 2. 自动添加redux-thunk中间件
+ 3. 添加了dev-mode中间件来捕获意外的变更
+ 4. 自动设置redux devtools extension
+ 5. 中间件和devtools增强器被组合到一起添加到store中
+createSlice 用来方便的编写reducer。
+
+
+核心概念 
+为什么android这么好写，因为java中的bean可以通过setter和getter来方便的改变
+但是react不行。state只在函数组件内部存在，并且每次重新渲染都会被重置，所以需要一个全局的state来存储数据
+这个全局的state就是redux，redux是一个全局的状态管理器，用来存储全局的数据
+在redux之前如何处理的呢？主要分为3步骤
+1. 创建一个state保存的对象,包含多个属性
+2. 创建一个action，包含一个type属性和一个任意属性。type是动作，属性是动作的参数,基本和
+3. 然后写一个函数，这个函数可以通过action来改变state，这个函数就是reducer
+4. 最后通过一个大的函数来管理所有的reducer.这个就是redux的思想
