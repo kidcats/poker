@@ -50,13 +50,6 @@ export const calculatePosition = (index: number, position: Position | null) => {
         console.log("bad index", index);
     }
     // 最后所有的结果都要还原到以文档左上角为原点的坐标系中
-    console.log('cardX', cardX + x);
-    console.log('cardY', cardY + y);
-    console.log('x', x);
-    console.log('y', y);
-    console.log('width', width);
-    console.log('height', height);
-    console.log('index', index);
     return { cardX: cardX, cardY: cardY + windowHeight, rotate: rotate };
 }
 
@@ -71,6 +64,5 @@ export const calculateCenterPosition = (index:number) => {
         document.body.clientHeight) * 0.35;
     const pw = 80 ;
     const cardX = (index - 2) * 1.5 * pw;
-    console.log('cardX', cardX);
     return { cardX: cardX, cardY: windowHeight, rotate: 0};
 }
