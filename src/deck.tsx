@@ -5,7 +5,6 @@ import { usePosition } from "./positionContext";
 import { calculatePosition, calculateCenterPosition } from "./utils"
 import { useDispatch, useSelector } from "react-redux";
 import { reset, roundSelector } from "./gameRoundSlice";
-import { group } from "console";
 
 
 const cards = [
@@ -78,6 +77,17 @@ const toPublic = (clicked: boolean, cardX: number, cardY: number, rotate: number
         scale: 1,
         clicked
     };
+}
+
+
+const toOrigin = (clicked:boolean):CardProps => {
+    return {
+        x: 0,
+        y: 0,
+        rot: 0,
+        scale: 1,
+        clicked
+    }
 }
 
 interface DeckProps {
@@ -159,8 +169,27 @@ const Deck: React.FC<DeckProps> = (props) => {
             prev[14] = true;
             setFlipped(prev);
         }else if(gameRound === 5){
-            /// 游戏结束，可以结算了,同时重置游戏
+            /// 游戏结束，可以结算了,同时展示所有玩家的牌
+            /// 结算的话需要你将当前所有用户的牌都翻出来，话说有没有一个办法可以指定翻哪张牌？答案是可以的
+            /// 重置游戏可以，但是别忘了重置牌的状态
+            const prev = [...flippedArray];
+            prev.fill(true);
+            setFlipped(prev);
+            
+        }else if(gameRound === 6){
             dispatch(reset());
+            /// 结算结束，将所有的牌放回原来的位置
+            const prev = [...flippedArray];
+            prev.fill(false);
+            setFlipped(prev);
+            /// 同时回收牌的位置
+            for(let i = 0; i < 15; i++){
+                api.start(index => {
+                    if(i == index){
+                        return toOrigin(moveDIndex[i]);
+                    }
+                });
+            }
         }
       
       }, [gameRound, api, position]); // 添加所有需要的依赖
