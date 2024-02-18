@@ -4,7 +4,8 @@ import './deck.scss';
 import { usePosition } from "./positionContext";
 import { calculatePosition, calculateCenterPosition } from "./utils"
 import { useDispatch, useSelector } from "react-redux";
-import { roundSelector } from "./gameRoundSlice";
+import { reset, roundSelector } from "./gameRoundSlice";
+import { group } from "console";
 
 
 const cards = [
@@ -25,8 +26,14 @@ const cards = [
     './assets/clubs_9.svg',
 ];
 
-const getCardImage = (i: number) => {
-    return require(`${cards[i]}`);
+const backImg = './assets/bg.svg';
+
+const getCardImage = (i: number,flipped:boolean) => {
+    if(flipped){
+    return require(`${cards[i]}`);}
+    else{
+        return require(`${backImg}`);
+    }
 };
 
 interface CardProps {
@@ -81,6 +88,7 @@ interface DeckProps {
 
 const Deck: React.FC<DeckProps> = (props) => {
     const [moveDIndex, setMoved] = useState(Array(cards.length).fill(false));
+    const [flippedArray,setFlipped] = useState(Array(cards.length).fill(false));
     // 用于记录当前游戏的轮次
     const gameRound = useSelector(roundSelector);
     // 创建一个dispatch，用于发送action更新状态
@@ -133,6 +141,26 @@ const Deck: React.FC<DeckProps> = (props) => {
                 }
             });
           }
+        }else if (gameRound === 2){
+            /// 如果等于2说明进入翻公共牌前三张的阶段
+            const prev = [...flippedArray];
+            prev[10] = true;
+            prev[11] = true;
+            prev[12] = true;
+            setFlipped(prev);
+        }else if(gameRound === 3){
+            // 进入翻第4张牌
+            const prev = [...flippedArray];
+            prev[13] = true;
+            setFlipped(prev);
+        }else if(gameRound === 4){
+            // 进入翻第5张牌就可以结算了
+            const prev = [...flippedArray];
+            prev[14] = true;
+            setFlipped(prev);
+        }else if(gameRound === 5){
+            /// 游戏结束，可以结算了,同时重置游戏
+            dispatch(reset());
         }
       
       }, [gameRound, api, position]); // 添加所有需要的依赖
@@ -148,10 +176,13 @@ const Deck: React.FC<DeckProps> = (props) => {
                                 translate(${x}px, ${y}px)
                                 rotate(${r}turn) 
                                 scale(${s})`
-                            )
+                            ),
                         }}
                     >
-                        <img src={getCardImage(i)} alt="card" />
+                        <animated.img src={getCardImage(i,flippedArray[i])} alt="card" 
+                        style={{
+                            transform: rot.to(r => `perspective(600px) rotateY(${r}turn)`)
+                        }}/>
                     </animated.div>
                 ))
         }
