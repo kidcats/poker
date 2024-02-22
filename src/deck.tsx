@@ -5,6 +5,7 @@ import { usePosition } from "./positionContext";
 import { calculatePosition, calculateCenterPosition } from "./utils"
 import { useDispatch, useSelector } from "react-redux";
 import { reset, roundSelector } from "./gameRoundSlice";
+import { userArraySelector } from "./userArraySlice";
 
 
 const cards = [
@@ -90,17 +91,14 @@ const toOrigin = (clicked:boolean):CardProps => {
     }
 }
 
-interface DeckProps {
-    round: number;
-    playerCount: number;
-}
 
 
-const Deck: React.FC<DeckProps> = (props) => {
+const Deck: React.FC = () => {
     const [moveDIndex, setMoved] = useState(Array(cards.length).fill(false));
     const [flippedArray,setFlipped] = useState(Array(cards.length).fill(false));
     // 用于记录当前游戏的轮次
     const gameRound = useSelector(roundSelector);
+    const users = useSelector(userArraySelector);
     // 创建一个dispatch，用于发送action更新状态
     const dispatch = useDispatch();
 
@@ -136,7 +134,7 @@ const Deck: React.FC<DeckProps> = (props) => {
           for (let i = 0; i < 10; i++) {
             let { cardX, cardY, rotate } = calculatePosition(i, position)!;
             api.start( index => {
-                if(i == index){
+                if(i == index && users[i] !== undefined){
                     return toNew(moveDIndex[i], cardX, cardY, rotate);
                 }
             });

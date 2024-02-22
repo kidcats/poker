@@ -36,3 +36,29 @@
     transform: rotate(360deg);
   }
 }
+
+
+.bottom-bar {
+  display: flex;              /* Use flexbox to layout the child elements */
+  justify-content: space-around; /* Distribute space around the items */
+  align-items: center;        /* Center items vertically */
+  width: 100%;                /* Set the width to span the full viewport width */
+  position: fixed;            /* Fix position to the bottom of the page */
+  bottom: 0;                  /* Align to the bottom */
+  left: 0;                    /* Align to the left */
+  padding: 10px 0;            /* Add some padding on top and bottom */
+}
+
+.bottom-bar button {
+  flex: 1;                    /* Allow buttons to grow and fill the space */
+  background-color: #4CAF50;  /* Set the background color */
+  color: white;               /* Set the text color to white */
+  padding: 15px 32px;         /* Set the padding */
+  text-align: center;         /* Center the text */
+  text-decoration: none;      /* No text decoration */
+  display: inline-block;      /* Display as inline-block */
+  font-size: 16px;            /* Set the font size */
+  margin: 4px 2px;            /* Set the margin */
+  cursor: pointer;            /* Change cursor to pointer on hover */
+  border-radius: 4px;         /* Rounded corners */
+}
