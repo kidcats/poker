@@ -1,4 +1,4 @@
-import { User } from "./user"; // 假设 User 接口在 user.ts 文件中被定义
+import { User } from "./data/user"; // 假设 User 接口在 user.ts 文件中被定义
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "./store";
 
@@ -19,7 +19,7 @@ const userArraySlice = createSlice({
             state.users.push(action.payload);
         },
         leave: (state, action: PayloadAction<string>) => {
-            state.users = state.users.filter(user => user.id !== action.payload);
+            state.users = state.users.filter(user => user.userId !== action.payload);
         },
         disband: (state) => {
             state.users = [];

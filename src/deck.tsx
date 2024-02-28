@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
-import { useSprings, animated, to ,useTransition } from '@react-spring/web';
+import { useSprings, animated, to, useTransition } from '@react-spring/web';
 import './deck.scss';
 import { usePosition } from "./positionContext";
 import { calculatePosition, calculateCenterPosition } from "./utils"
 import { useDispatch, useSelector } from "react-redux";
 import { reset, roundSelector } from "./gameRoundSlice";
 import { userArraySelector } from "./userArraySlice";
+import { GameInfo } from "./data/gameInfo";
+import { getCurrentGameInfo } from "./interface/getUser";
 
 
 const cards = [
@@ -28,10 +30,11 @@ const cards = [
 
 const backImg = './assets/bg.svg';
 
-const getCardImage = (i: number,flipped:boolean) => {
-    if(flipped){
-    return require(`${cards[i]}`);}
-    else{
+const getCardImage = (i: number, flipped: boolean) => {
+    if (flipped) {
+        return require(`${cards[i]}`);
+    }
+    else {
         return require(`${backImg}`);
     }
 };
@@ -81,7 +84,7 @@ const toPublic = (clicked: boolean, cardX: number, cardY: number, rotate: number
 }
 
 
-const toOrigin = (clicked:boolean):CardProps => {
+const toOrigin = (clicked: boolean): CardProps => {
     return {
         x: 0,
         y: 0,
@@ -93,9 +96,13 @@ const toOrigin = (clicked:boolean):CardProps => {
 
 
 
+
+
 const Deck: React.FC = () => {
-    const [moveDIndex, setMoved] = useState(Array(cards.length).fill(false));
-    const [flippedArray,setFlipped] = useState(Array(cards.length).fill(false));
+    const [moveDIndex, setMoved] = useState(Array(20).fill(false)); // 用于标记牌是否移动
+    const [flippedArray, setFlipped] = useState(Array(20).fill(false)); // 用于标记牌是否翻开
+    const [gameInfo, setGameInfo] = useState<GameInfo | null>(null);
+    const [blindIndex, setBlindIndex] = useState(2); // 用于标记小盲的的位置
     // 用于记录当前游戏的轮次
     const gameRound = useSelector(roundSelector);
     const users = useSelector(userArraySelector);
@@ -106,7 +113,7 @@ const Deck: React.FC = () => {
     const x = 0;
     const y = 0;
     const r = 0;
-    const [springs, api] = useSprings(cards.length, index => ({
+    const [springs, api] = useSprings(20, index => ({
         ...from(),
         ...toNew(moveDIndex[index], x, y, r),
     }));
@@ -126,71 +133,101 @@ const Deck: React.FC = () => {
 
 
     const position = usePosition().position;
+
+
+
+
+    /// game infor 
+    const fetchGameInfo = async () => {
+        try {
+            const fetchInfo = await getCurrentGameInfo("game1");
+            setGameInfo(fetchInfo);
+        } catch (error) {
+            console.error("Error fetching game info:", error);
+        }
+    }
+
+
+
     // 在组件渲染时操作状态
     useEffect(() => {
+        fetchGameInfo(); // 获取对应的游戏信息并放到state中
         if (gameRound === 1) {
-          reverseCardMoved();
-          // 牌面分发到玩家前
-          for (let i = 0; i < 10; i++) {
-            let { cardX, cardY, rotate } = calculatePosition(i, position)!;
-            api.start( index => {
-                if(i == index && users[i] !== undefined){
-                    return toNew(moveDIndex[i], cardX, cardY, rotate);
+            reverseCardMoved(); // 通知所有的牌可以移动了，所以这里我就要控制那些牌可以移动
+            // 牌面分发到玩家
+            let allI = 0;
+            let usersInfo = gameInfo?.users;
+            if (usersInfo !== undefined) {
+                let userLength = usersInfo.length;
+                let tempIndex = blindIndex;
+                console.log(userLength + "  userlength")
+                while (userLength !== undefined && allI < userLength) {
+                    console.log("allI " + allI);
+                    tempIndex = (tempIndex+1) % userLength;
+                    console.log("tempIndex " + tempIndex);
+                    let pokerIndex = usersInfo[tempIndex].userIndex;
+                    console.log("pokerIndex " + pokerIndex);
+                    let { cardX, cardY, rotate } = calculatePosition(pokerIndex, position)!;
+                    api.start(index => {
+                        if (pokerIndex == index) {
+                            return toNew(moveDIndex[pokerIndex], cardX, cardY, rotate);
+                        }
+                    });
+                    allI++;
                 }
-            });
             }
-      
-          // 发5张公共牌
-          for (let i = 10; i < 15; i++) {
-            let { cardX, cardY, rotate } = calculateCenterPosition(i - 10)!;
-            api.start(index => {
-                if(index == i){
-                return toPublic(moveDIndex[i], cardX, cardY, rotate);
-                }
-            });
-          }
-        }else if (gameRound === 2){
+
+            // 发5张公共牌
+            for (let i = 10; i < 15; i++) {
+                let { cardX, cardY, rotate } = calculateCenterPosition(i - 10)!;
+                api.start(index => {
+                    if (index == i) {
+                        return toPublic(moveDIndex[i], cardX, cardY, rotate);
+                    }
+                });
+            }
+        } else if (gameRound === 2) {
             /// 如果等于2说明进入翻公共牌前三张的阶段
             const prev = [...flippedArray];
             prev[10] = true;
             prev[11] = true;
             prev[12] = true;
             setFlipped(prev);
-        }else if(gameRound === 3){
+        } else if (gameRound === 3) {
             // 进入翻第4张牌
             const prev = [...flippedArray];
             prev[13] = true;
             setFlipped(prev);
-        }else if(gameRound === 4){
+        } else if (gameRound === 4) {
             // 进入翻第5张牌就可以结算了
             const prev = [...flippedArray];
             prev[14] = true;
             setFlipped(prev);
-        }else if(gameRound === 5){
+        } else if (gameRound === 5) {
             /// 游戏结束，可以结算了,同时展示所有玩家的牌
             /// 结算的话需要你将当前所有用户的牌都翻出来，话说有没有一个办法可以指定翻哪张牌？答案是可以的
             /// 重置游戏可以，但是别忘了重置牌的状态
             const prev = [...flippedArray];
             prev.fill(true);
             setFlipped(prev);
-            
-        }else if(gameRound === 6){
+
+        } else if (gameRound === 6) {
             dispatch(reset());
             /// 结算结束，将所有的牌放回原来的位置
             const prev = [...flippedArray];
             prev.fill(false);
             setFlipped(prev);
             /// 同时回收牌的位置
-            for(let i = 0; i < 15; i++){
+            for (let i = 0; i < 15; i++) {
                 api.start(index => {
-                    if(i == index){
+                    if (i == index) {
                         return toOrigin(moveDIndex[i]);
                     }
                 });
             }
         }
-      
-      }, [gameRound, api, position]); // 添加所有需要的依赖
+
+    }, [gameRound, api, position]); // 添加所有需要的依赖
     return <>
         {
             springs.map
@@ -206,10 +243,7 @@ const Deck: React.FC = () => {
                             ),
                         }}
                     >
-                        <animated.img src={getCardImage(i,flippedArray[i])} alt="card" 
-                        style={{
-                            transform: rot.to(r => `perspective(600px) rotateY(${r}turn)`)
-                        }}/>
+                        <animated.img src={getCardImage(i, flippedArray[i])} alt="card" />
                     </animated.div>
                 ))
         }

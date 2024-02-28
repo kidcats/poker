@@ -7,7 +7,7 @@ import Deck from './deck';
 import PokerChip from './chip';
 import { useDispatch } from 'react-redux';
 import { apply } from './userArraySlice';
-import { getUser } from './interface/getUser';
+import { getCurrentGameInfo } from './interface/getUser';
 import { increment } from './gameRoundSlice';
 
 /// 现在是什么，界面都画好了，现在可以开始写逻辑了
@@ -23,7 +23,7 @@ function App() {
 
   // 通过一个接口将一个用户添加到对应的全局状态数组中
   const applyGamehandleClick = () => {
-    dispatch(apply(getUser(userIndex+'')));
+    
   };
   const checkhandleClick = () => {
 
