@@ -1,41 +1,48 @@
 import { useState, useEffect } from "react";
 import { useSprings, animated, to } from '@react-spring/web';
 import './deck.scss';
-import { usePosition } from "./positionContext";
-import { calculatePosition, calculateCenterPosition } from "./utils"
+import { usePosition } from "../states/positionContext";
+import { calculatePosition, calculateCenterPosition } from "../utils"
 import { useDispatch, useSelector } from "react-redux";
-import { reset, roundSelector } from "./gameRoundSlice";
-import { userArraySelector } from "./userArraySlice";
-import { GameInfo } from "./data/gameInfo";
-import { getCurrentGameInfo } from "./interface/getUser";
+import { reset, roundSelector } from "../states/gameRoundSlice";
+import { userArraySelector } from "../states/userArraySlice";
+import { GameInfo } from "../data/gameInfo";
+import { getCurrentGameInfo } from "../interface/getUser";
 
+import backImg from '../assets/bg.svg';
+import spadesA from '../assets/spades_A.svg';
+import heartsA from '../assets/hearts_A.svg';
+import diamondsA from '../assets/diamonds_A.svg';
+import clubsA from '../assets/clubs_A.svg';
+import clubsK from '../assets/clubs_K.svg';
+import clubsQ from '../assets/clubs_Q.svg';
+import clubsJ from '../assets/clubs_J.svg';
+import clubs10 from '../assets/clubs_10.svg';
+import clubs9 from '../assets/clubs_9.svg';
 
 const cards = [
-    './assets/spades_A.svg',
-    './assets/spades_A.svg',
-    './assets/spades_A.svg',
-    './assets/hearts_A.svg',
-    './assets/hearts_A.svg',
-    './assets/hearts_A.svg',
-    './assets/diamonds_A.svg',
-    './assets/diamonds_A.svg',
-    './assets/diamonds_A.svg',
-    './assets/clubs_A.svg',
-    './assets/clubs_K.svg',
-    './assets/clubs_Q.svg',
-    './assets/clubs_J.svg',
-    './assets/clubs_10.svg',
-    './assets/clubs_9.svg',
+    spadesA,
+    spadesA,
+    spadesA,
+    heartsA,
+    heartsA,
+    heartsA,
+    diamondsA,
+    diamondsA,
+    diamondsA,
+    clubsA,
+    clubsK,
+    clubsQ,
+    clubsJ,
+    clubs10,
+    clubs9,
 ];
-
-const backImg = './assets/bg.svg';
 
 const getCardImage = (i: number, flipped: boolean) => {
     if (flipped) {
-        return require(`${cards[i]}`);
-    }
-    else {
-        return require(`${backImg}`);
+        return cards[i];
+    } else {
+        return backImg;
     }
 };
 
@@ -141,7 +148,7 @@ const Deck: React.FC = () => {
 
 
 
-    // 在组件渲染时操作状态
+    // 在牌组件渲染时操作状态
     useEffect(() => {
         fetchGameInfo(); // 获取对应的游戏信息并放到state中
         if (gameRound === 1) {
@@ -225,6 +232,9 @@ const Deck: React.FC = () => {
         }
 
     }, [gameRound, api, position]); // 添加所有需要的依赖
+
+
+
     return <>
         {
             springs.map

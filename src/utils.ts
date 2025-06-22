@@ -1,4 +1,4 @@
-import { Position } from "./positionContext";
+import { Position } from "./states/positionContext";
 
 // 计算位置，可以分为两组，一组在椭圆上，一组在矩形上
 // 首先是椭圆的

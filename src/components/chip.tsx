@@ -3,8 +3,8 @@ import React, { useState } from 'react';
 import { useSpring, animated, to } from 'react-spring';
 import { useDrag } from 'react-use-gesture';
 import './chip.scss';
-import { calculatePosition } from './utils';
-import { usePosition } from './positionContext';
+import { calculatePosition } from '../utils';
+import { usePosition } from '../states/positionContext';
 
 interface ChipProps {
   value: number;

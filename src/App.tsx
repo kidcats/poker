@@ -1,14 +1,12 @@
 // App.tsx
 import './App.css';
 import { useState } from 'react';
-import Table from './table';
-import { PositionProvider } from './positionContext';
-import Deck from './deck';
-import PokerChip from './chip';
+import Table from './components/table';
+import { PositionProvider } from './states/positionContext';
+import Deck from './components/deck';
+import PokerChip from './components/chip';
 import { useDispatch } from 'react-redux';
-import { apply } from './userArraySlice';
-import { getCurrentGameInfo } from './interface/getUser';
-import { increment } from './gameRoundSlice';
+import { increment } from './states/gameRoundSlice';
 
 /// 现在是什么，界面都画好了，现在可以开始写逻辑了
 /// 总共是4个回合 翻前，翻后，转牌，河牌，所以可以定义一个状态，来表示当前是哪个回合
@@ -64,7 +62,7 @@ function App() {
         <PokerChip value={1000} index={0} />
         <div className="bottom-bar">
           <button onClick={increasehandleClick}>
-            increase
+            ready
           </button>
           <button onClick={applyGamehandleClick}>
             apply game

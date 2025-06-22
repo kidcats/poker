@@ -1,4 +1,4 @@
-import { User } from "./data/user"; // 假设 User 接口在 user.ts 文件中被定义
+import { User } from "../data/user"; // 假设 User 接口在 user.ts 文件中被定义
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "./store";
 

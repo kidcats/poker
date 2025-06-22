@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import './table.scss'
-import { PositionContext } from './positionContext';
+import { PositionContext } from '../states/positionContext';
 
 
 

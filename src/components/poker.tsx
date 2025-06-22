@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useSprings, animated } from '@react-spring/web';
 import './poker.css';
-import cardBack from './assets/bg.svg';
+import cardBack from '../assets/bg.svg';
 
 interface Card {
   suit: string;
@@ -9,7 +9,7 @@ interface Card {
   flipped: boolean;
 }
 
-const img_path = './assets/';
+const img_path = '../assets/';
 
 const getCardImage = (suit: string, value: string) => {
   return require(`${img_path}${suit}_${value}.svg`);
