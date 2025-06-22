@@ -1,5 +1,5 @@
-import { Action,ActionType } from '../data/action';
-import { Card,Suit,Rank } from '../data/card';
+import { Action,ActionType } from '../types/action';
+import { Card,Suit,Rank } from '../types/card';
 
 
 // Assuming Suit and Rank enums are defined as previously discussed.

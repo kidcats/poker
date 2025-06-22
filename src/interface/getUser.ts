@@ -1,5 +1,5 @@
-import { User } from "../data/user";
-import { GameInfo } from "../data/gameInfo";
+import { User } from "../types/user";
+import { GameInfo } from "../types/gameInfo";
 
 export async function getCurrentGameInfo(gameID: string): Promise<GameInfo> {
   try {

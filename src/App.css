@@ -1,7 +1,35 @@
+/* App.css */
 .App {
   text-align: center;
+  position: relative;  /* 添加：让子元素的绝对定位相对于此容器 */
+  width: 100vw;        /* 添加：全宽 */
+  height: 100vh;       /* 添加：全高 */
+  overflow: hidden;    /* 添加：防止滚动条 */
 }
 
+/* 为游戏信息添加样式 */
+.game-info {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.9);
+  padding: 10px 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 20;
+}
+
+.game-info h1 {
+  margin: 0 0 10px 0;
+  font-size: 24px;
+}
+
+.game-info p {
+  margin: 5px 0;
+}
+
+/* 原有的样式保留 */
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -37,28 +65,99 @@
   }
 }
 
-
+/* 更新 bottom-bar 样式 */
 .bottom-bar {
-  display: flex;              /* Use flexbox to layout the child elements */
-  justify-content: space-around; /* Distribute space around the items */
-  align-items: center;        /* Center items vertically */
-  width: 100%;                /* Set the width to span the full viewport width */
-  position: fixed;            /* Fix position to the bottom of the page */
-  bottom: 0;                  /* Align to the bottom */
-  left: 0;                    /* Align to the left */
-  padding: 10px 0;            /* Add some padding on top and bottom */
+  display: flex;
+  flex-direction: column;     /* 改为垂直布局 */
+  gap: 15px;                  /* 添加间距 */
+  align-items: center;
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  padding: 20px;              /* 增加内边距 */
+  background: rgba(255, 255, 255, 0.95);  /* 添加半透明背景 */
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);  /* 添加阴影 */
+  z-index: 20;                /* 确保在最上层 */
 }
 
+/* 游戏控制区域 */
+.game-controls {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+/* 玩家操作区域 */
+.player-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;  /* 允许换行 */
+}
+
+/* 加注控制区域 */
+.raise-control {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.raise-control input[type="range"] {
+  width: 150px;
+}
+
+.raise-control span {
+  min-width: 50px;
+  text-align: center;
+  font-weight: bold;
+}
+
+/* 更新按钮样式 */
 .bottom-bar button {
-  flex: 1;                    /* Allow buttons to grow and fill the space */
-  background-color: #4CAF50;  /* Set the background color */
-  color: white;               /* Set the text color to white */
-  padding: 15px 32px;         /* Set the padding */
-  text-align: center;         /* Center the text */
-  text-decoration: none;      /* No text decoration */
-  display: inline-block;      /* Display as inline-block */
-  font-size: 16px;            /* Set the font size */
-  margin: 4px 2px;            /* Set the margin */
-  cursor: pointer;            /* Change cursor to pointer on hover */
-  border-radius: 4px;         /* Rounded corners */
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;         /* 调整内边距 */
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 0;                  /* 移除外边距 */
+  cursor: pointer;
+  border: none;               /* 移除边框 */
+  border-radius: 4px;
+  transition: background-color 0.3s ease;  /* 添加过渡效果 */
+}
+
+.bottom-bar button:hover:not(:disabled) {
+  background-color: #45a049;
+}
+
+.bottom-bar button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+/* 分隔线样式 */
+.bottom-bar hr {
+  width: 100%;
+  margin: 0;
+  border: none;
+  border-top: 1px solid #ddd;
+}
+
+/* 确保 body 和 html 正确设置 */
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+html {
+  height: 100%;
+}
+
+#root {
+  height: 100%;
 }

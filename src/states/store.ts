@@ -1,14 +1,17 @@
 import { configureStore } from "@reduxjs/toolkit";
-import gameRoundReducer from "./gameRoundSlice";
-import userArrayReducer from "./userArraySlice";
-
+import gameReducer from "./gameSlice";
 
 const store = configureStore({
   reducer: {
-    round: gameRoundReducer, // round 是 gameRoundSlice 的 state
-    userArray: userArrayReducer, // userArray 是 userArraySlice 的 state
+    game: gameReducer,
   },
 });
 
+// 导出 RootState 类型，用于 useSelector hook
 export type RootState = ReturnType<typeof store.getState>;
+
+// === 新增的行 ===
+// 导出 AppDispatch 类型，用于 useDispatch hook
+export type AppDispatch = typeof store.dispatch;
+
 export default store;
