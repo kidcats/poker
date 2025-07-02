@@ -1,21 +1,12 @@
-1. **定义游戏逻辑**：实现使用这些接口的核心游戏逻辑，包括发牌、管理玩家行为以及确定每手牌的获胜者。
-
-2. **创建玩家管理**：开发添加、删除和管理游戏中玩家的功能，包括跟踪他们的筹码数量和当前赌注。
-
-3. **实施下注回合**：根据德州扑克规则对下注回合（翻牌前、翻牌圈、转牌圈和河牌圈）进行编码，处理下注、加注、跟注、弃牌和过牌。
-
-4. **确定获胜者**：编写评估手牌强度并确定每轮获胜者的逻辑，包括处理平局。
-
-5. **处理底池分配**：实现每轮结束后获胜玩家之间底池计算和分配的逻辑。
-
-6. **开发用户界面（可选）**：如果项目不仅仅是后端服务，请开始开发用户界面，允许玩家与游戏交互，查看他们的牌、公共牌并做出操作。
-
-7. **测试**：为您的游戏逻辑编写单元测试，以确保它正确处理所有可能的场景。
-
-8. **细化和优化**：细化游戏逻辑并优化代码的性能和可靠性。
-
-9. **文档**：记录您的代码和 API 端点（如果有）以供将来参考和其他开发人员使用。
-
-10. **部署**：准备部署应用程序，并将其部署到服务器或云服务（如果适用）。
-
-每一步都涉及详细的规划和实施。
+import spades_2 from '../assets/spades_2.svg';
+import spades_3 from '../assets/spades_3.svg';
+import spades_4 from '../assets/spades_4.svg';
+import spades_5 from '../assets/spades_5.svg';
+import spades_6 from '../assets/spades_6.svg';
+import spades_7 from '../assets/spades_7.svg';
+import spades_8 from '../assets/spades_8.svg';
+import spades_9 from '../assets/spades_9.svg';
+import spades_A from '../assets/spades_A.svg';
+import spades_J from '../assets/spades_J.svg';
+import spades_Q from '../assets/spades_Q.svg';
+import spades_K from '../assets/spades_K.svg';

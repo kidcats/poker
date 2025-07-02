@@ -1,79 +1,60 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import { PositionProvider } from './states/positionContext';
-
-// Redux 和状态管理
 import { selectGame, addPlayer, startGame, fold, check, call, raise } from './states/gameSlice';
-import { GamePhase, Player } from './types';
-
-// 组件
-import Table from './components/table';
-import Deck from './components/deck';
+import { GamePhase, PlayerStatus } from './types';
 import { useAppDispatch, useAppSelector } from './states/hooks';
+import Table from './components/table';
 
 function App() {
   const gameState = useAppSelector(selectGame);
   const dispatch = useAppDispatch();
 
-  // --- React 本地状态 ---
   const [ownPlayerId, setOwnPlayerId] = useState<string | null>(null);
-  // 使用 state 来管理加注滑块的值
-  const [raiseAmount, setRaiseAmount] = useState(gameState.minRaiseAmount);
+  const [raiseAmount, setRaiseAmount] = useState(0);
+  const [aiCount, setAiCount] = useState(5);
 
-  // --- 玩家和回合状态计算 ---
   const ownPlayer = gameState.players.find(p => p.id === ownPlayerId);
   const ownPlayerIndex = ownPlayer ? gameState.players.indexOf(ownPlayer) : -1;
   
   const isMyTurn = gameState.gamePhase > GamePhase.WAITING &&
                    gameState.gamePhase < GamePhase.SHOWDOWN &&
                    gameState.currentPlayerIndex === ownPlayerIndex &&
-                   ownPlayer?.status === 'active';
+                   ownPlayer?.status === PlayerStatus.ACTIVE;
 
-  // --- 按钮可用性逻辑 ---
   const canCheck = isMyTurn && ownPlayer && ownPlayer.currentRoundBet === gameState.currentRoundBet;
   const canCall = isMyTurn && ownPlayer && ownPlayer.currentRoundBet < gameState.currentRoundBet;
   const callAmount = gameState.currentRoundBet - (ownPlayer?.currentRoundBet || 0);
 
-  // --- 效果钩子 (Effects) ---
-  // 1. 自动添加AI玩家 (仅在游戏开始前)
   useEffect(() => {
-    if (gameState.gamePhase === GamePhase.WAITING && gameState.players.length === 1 && ownPlayerId) {
-      for (let i = 1; i < 6; i++) {
-        dispatch(addPlayer({ id: `ai-${i}`, name: `AI Player ${i}`, stack: 1000, isAI: true }));
-      }
-    }
-  }, [gameState.players.length, ownPlayerId, gameState.gamePhase, dispatch]);
-  
-  // 2. 当轮到AI时，自动执行操作
-  useEffect(() => {
+    if (gameState.gamePhase < GamePhase.PRE_FLOP || gameState.gamePhase >= GamePhase.SHOWDOWN) return;
     const currentPlayer = gameState.players[gameState.currentPlayerIndex!];
-    if (currentPlayer && currentPlayer.isAI && gameState.gamePhase < GamePhase.SHOWDOWN) {
-      // 设置一个短暂的延迟，让玩家能看清AI的行动
+    if (currentPlayer && currentPlayer.isAI && currentPlayer.status === PlayerStatus.ACTIVE) {
       const aiActionTimeout = setTimeout(() => {
-        // 非常简单的AI逻辑：如果可以过牌就过牌，否则就弃牌
-        if (currentPlayer.currentRoundBet === gameState.currentRoundBet) {
-          dispatch(check());
-        } else {
-          dispatch(fold());
+        if (currentPlayer.currentRoundBet === gameState.currentRoundBet) dispatch(check());
+        else {
+          const amountToCall = gameState.currentRoundBet - currentPlayer.currentRoundBet;
+          if (currentPlayer.stack >= amountToCall) dispatch(call());
+          else dispatch(fold());
         }
-      }, 1000); // 1秒延迟
-
+      }, 1000);
       return () => clearTimeout(aiActionTimeout);
     }
   }, [gameState.currentPlayerIndex, gameState.players, gameState.currentRoundBet, gameState.gamePhase, dispatch]);
 
-  // 3. 当最小加注额变化时，同步更新滑块的值
-  useEffect(() => {
-    setRaiseAmount(gameState.minRaiseAmount);
-  }, [gameState.minRaiseAmount]);
+  useEffect(() => { setRaiseAmount(gameState.minRaiseAmount); }, [gameState.minRaiseAmount]);
 
-
-  // --- 事件处理器 ---
   const handleJoinGame = () => {
-    if (ownPlayerId) return; // 防止重复加入
+    if (ownPlayerId) return;
     const newPlayerId = `player-${Math.random().toString(36).substr(2, 9)}`;
     dispatch(addPlayer({ id: newPlayerId, name: 'You', stack: 1000, isAI: false }));
     setOwnPlayerId(newPlayerId);
+  };
+
+  const handleAddAI = () => {
+    for (let i = 0; i < aiCount; i++) {
+        dispatch(addPlayer({ id: `ai-${Date.now()}-${i}`, name: `AI Player ${i + 1}`, stack: 1000, isAI: true }));
+    }
   };
 
   const handleStartGame = () => dispatch(startGame());
@@ -88,13 +69,39 @@ function App() {
     }
   };
 
+  const isGameWaiting = gameState.gamePhase === GamePhase.WAITING;
+  const isGameEnded = gameState.gamePhase === GamePhase.ENDED;
+  const canStartGame = isGameWaiting && gameState.players.length >= 2;
+
   return (
     <PositionProvider>
       <div className="App">
+        {/* ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼ */}
+        {/* NEW: 游戏结束界面 */}
+        {isGameEnded && gameState.showdownResults && (
+          <div className="game-result-overlay">
+            <div className="game-result-box">
+              <h2>游戏结束</h2>
+              {gameState.showdownResults.map(result => (
+                <div key={result.player.id} className="winner-info">
+                  <p>
+                    <strong>{result.player.name}</strong> 赢得了底池
+                  </p>
+                  <p>牌型: {result.handResult.handName}</p>
+                </div>
+              ))}
+              <button onClick={handleStartGame} className="new-game-button">
+                开始新游戏
+              </button>
+            </div>
+          </div>
+        )}
+        {/* ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲ */}
+        
         <div className="game-info">
           <h1>德州扑克 - {GamePhase[gameState.gamePhase]}</h1>
           <p>底池 (Pot): {gameState.pot}</p>
-          <p>当前下注 (Current Bet): {gameState.currentRoundBet}</p>
+          {gameState.gamePhase > GamePhase.PRE_DEAL && <p>当前下注 (Current Bet): {gameState.currentRoundBet}</p>}
         </div>
         
         <Table 
@@ -103,39 +110,35 @@ function App() {
           pot={gameState.pot}
           currentPlayerIndex={gameState.currentPlayerIndex}
           dealerIndex={gameState.dealerIndex}
-          ownPlayerId={ownPlayerId}  // 传递 ownPlayerId 给 Table
+          ownPlayerId={ownPlayerId}
+          gamePhase={gameState.gamePhase} // <-- 传递 gamePhase
+          gameId={gameState.gameId} // <-- 传递 gameId
         />
         
         <div className="bottom-bar">
-          {/* 游戏控制 */}
-          <div className="game-controls">
-            <button onClick={handleJoinGame} disabled={!!ownPlayerId}>加入游戏</button>
-            <button onClick={handleStartGame} disabled={gameState.gamePhase !== GamePhase.WAITING || gameState.players.length < 2}>开始游戏</button>
-          </div>
-
-          <hr />
-
-          {/* 玩家行动 */}
-          <div className="player-actions">
-            <button onClick={handleFold} disabled={!isMyTurn}>弃牌</button>
-            <button onClick={handleCheck} disabled={!canCheck}>过牌</button>
-            <button onClick={handleCall} disabled={!canCall}>
-              跟注 {canCall ? callAmount : ''}
-            </button>
-            <div className="raise-control">
-              <button onClick={handleRaise} disabled={!isMyTurn}>加注</button>
-              <input 
-                type="range" 
-                min={gameState.minRaiseAmount}
-                max={ownPlayer ? ownPlayer.stack + ownPlayer.currentRoundBet : gameState.minRaiseAmount}
-                step="10"
-                value={raiseAmount}
-                onChange={(e) => setRaiseAmount(parseInt(e.target.value, 10))}
-                disabled={!isMyTurn}
-              />
-              <span>{raiseAmount}</span>
+          {isGameWaiting && (
+            <div className="game-setup">
+              <button onClick={handleJoinGame} disabled={!!ownPlayerId}>{ownPlayerId ? '已加入' : '加入游戏'}</button>
+              <div className="ai-controls">
+                <input type="number" value={aiCount} onChange={(e) => setAiCount(Math.max(1, parseInt(e.target.value, 10) || 1))} min="1" max="9" />
+                <button onClick={handleAddAI}>添加 {aiCount} 个AI</button>
+              </div>
+              <button onClick={handleStartGame} disabled={!canStartGame}>开始游戏 ({gameState.players.length}人)</button>
             </div>
-          </div>
+          )}
+
+          {!isGameWaiting && !isGameEnded && (
+            <div className="player-actions">
+              <button onClick={handleFold} disabled={!isMyTurn}>弃牌</button>
+              <button onClick={handleCheck} disabled={!canCheck}>过牌</button>
+              <button onClick={handleCall} disabled={!canCall}>跟注 {canCall ? callAmount : ''}</button>
+              <div className="raise-control">
+                <button onClick={handleRaise} disabled={!isMyTurn}>加注</button>
+                <input type="range" min={gameState.minRaiseAmount} max={ownPlayer ? ownPlayer.stack + ownPlayer.currentRoundBet : gameState.minRaiseAmount} step="10" value={raiseAmount} onChange={(e) => setRaiseAmount(parseInt(e.target.value, 10))} disabled={!isMyTurn} />
+                <span>{raiseAmount}</span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </PositionProvider>

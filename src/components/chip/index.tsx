@@ -3,7 +3,7 @@ import { useSpring, animated, to } from '@react-spring/web';
 import { useDrag } from 'react-use-gesture';
 import './chip.scss';
 import { usePosition } from '../../states/positionContext';
-import { calculatePosition } from '../../utils';
+import { calculatePosition } from '../../utils/utils';
 
 // 1. 修复 Props 类型定义
 interface ChipProps {

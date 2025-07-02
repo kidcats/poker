@@ -2,7 +2,8 @@
 // ==                         常量定义 (Constants)                         ==
 // ========================================================================
 
-import { Position } from "./states/positionContext";
+import { Position } from "../states/positionContext";
+
 
 const CARD_WIDTH = 80;
 const CARD_HEIGHT = 120;

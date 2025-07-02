@@ -1,4 +1,5 @@
-import { Action,ActionType } from '../types/action';
+import { Action } from '@reduxjs/toolkit';
+import { ActionType } from '../types/action';
 import { Card,Suit,Rank } from '../types/card';
 
 
@@ -53,7 +54,7 @@ async function bettingRound(players: number): Promise<Action[]> {
     setTimeout(() => {
       let actions: Action[] = [];
       for (let i = 0; i < players; i++) {
-        actions.push({ type: ActionType.Check });
+        actions.push({ type: ActionType.CHECK });
       }
       resolve(actions);
     }, 200); // Simulating a 2-second delay

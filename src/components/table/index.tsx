@@ -1,16 +1,17 @@
 import React from 'react';
 import './table.scss';
-import { Player, Card } from '../../types';
-import Deck from '../deck'; // 导入 Deck 组件
+import { Player, Card, GamePhase } from '../../types';
+import Deck from '../deck';
 
-// 更新 Props 类型，添加 ownPlayerId
 interface TableProps {
   players: Player[];
   communityCards: Card[];
   pot: number;
   currentPlayerIndex: number | null;
   dealerIndex: number;
-  ownPlayerId: string | null; // 新增
+  ownPlayerId: string | null;
+  gamePhase: GamePhase;
+  gameId: string | null; // 新增 gameId 属性
 }
 
 const Table: React.FC<TableProps> = ({ 
@@ -19,30 +20,22 @@ const Table: React.FC<TableProps> = ({
   pot, 
   currentPlayerIndex, 
   dealerIndex,
-  ownPlayerId // 新增
+  ownPlayerId,
+  gamePhase ,
+  gameId // 新增 gameId 参数
 }) => {
   return (
     <div 
       className="game-page__table" 
       id="game-table"
-      style={{ position: 'relative' }} // 确保有相对定位
+      style={{ position: 'relative' }}
     >
       <div className="table__rail"></div>
       <div className="table__felt">
-        {/* 原有的公共牌显示 - 可以隐藏或保留作为占位符 */}
-        <div className="community-cards" style={{ visibility: 'hidden' }}>
-          {communityCards.map((card, index) => (
-            <div key={index} className="card-placeholder">
-              {card.rank}{card.suit}
-            </div>
-          ))}
-        </div>
-        
         <div className="pot-display">
           底池: {pot}
         </div>
         
-        {/* 原有的玩家显示 */}
         <div className="players-container">
           {players.map((player, index) => (
             <div key={player.id} className={`player-seat player-seat-${index}`}>
@@ -55,11 +48,12 @@ const Table: React.FC<TableProps> = ({
         </div>
       </div>
       
-      {/* 在 Table 内部渲染 Deck 组件 */}
       <Deck 
         players={players}
         communityCards={communityCards}
         ownPlayerId={ownPlayerId}
+        gamePhase={gamePhase}
+        gameId={gameId} // 传递 gameId
       />
     </div>
   );

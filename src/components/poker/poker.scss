@@ -1,0 +1,58 @@
+// poker.scss
+
+.poker-card-container {
+    width: 100%;
+    height: 100%;
+    perspective: 1000px; /* 赋予3D效果的景深 */
+
+    // 当这个容器有 .is-flipped 类时，内部卡片进行Y轴翻转
+    &.is-flipped {
+        .poker-card-inner {
+            transform: rotateY(180deg);
+        }
+    }
+}
+
+.poker-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s;
+    transform-style: preserve-3d; /* 保持3D变换效果 */
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    border-radius: 8px; /* 给卡牌加个圆角 */
+}
+
+.poker-card-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden; /* Safari */
+    backface-visibility: hidden; /* 隐藏元素的背面 */
+    border-radius: 8px;
+    overflow: hidden;
+    
+    // 添加一个背景色，防止图片因比例问题留白时露出透明背景
+    background-color: white;
+
+    img {
+        width: 100%;
+        height: 100%;
+        
+        // ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
+        // FIX: 修复图片被裁切的问题
+        // 'cover' 会填满容器但可能裁切图片，'contain' 会完整显示图片但可能留白
+        // object-fit: contain; 
+        // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+    }
+}
+
+// 卡牌正面，初始时是转过去的
+.poker-card-front {
+    transform: rotateY(180deg);
+}
+
+// 卡牌背面
+.poker-card-back {
+    // 可以在这里为牌背添加特定的样式
+}
