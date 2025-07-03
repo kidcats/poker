@@ -1,4 +1,3 @@
-import { Card, Suit, Rank } from '../types';
 
 // 引入所有卡牌资源
 import clubs_2 from '../assets/clubs_2.svg';
@@ -54,6 +53,7 @@ import spades_J from '../assets/spades_J.svg';
 import spades_Q from '../assets/spades_Q.svg';
 import spades_K from '../assets/spades_K.svg';
 import cardBack from '../assets/bg.svg';
+import { Card, Rank, Suit } from '../shared-types';
 
 // 创建一个巨大的映射表
 // ========================================================================

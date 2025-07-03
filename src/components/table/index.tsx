@@ -1,7 +1,7 @@
 import React from 'react';
 import './table.scss';
-import { Player, Card, GamePhase } from '../../types';
 import Deck from '../deck';
+import { Card, GamePhase, Player } from '../../shared-types';
 
 interface TableProps {
   players: Player[];

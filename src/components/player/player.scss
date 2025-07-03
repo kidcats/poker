@@ -1,0 +1,16 @@
+/* 在你的 App.css 或相关样式文件中添加 */
+
+.player-position-badge {
+  background-color: #333;
+  color: #fff;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  border: 2px solid #555;
+  margin: 0 5px;
+}

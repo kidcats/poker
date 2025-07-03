@@ -1,11 +1,13 @@
 import React from 'react';
 import { useSprings, animated, to } from '@react-spring/web';
-import { Card, Player, GamePhase, PlayerStatus } from '../../types';
 import { calculateCenterPosition, calculatePosition } from '../../utils/utils';
 import Poker from '../poker';
+import { Card, GamePhase, Player, PlayerStatus } from '../../shared-types';
 
+const CARD_ASPECT_RATIO = 1.4; 
 const CARD_WIDTH = 80;
-const CARD_HEIGHT = 112;
+// 让高度根据宽度和宽高比自动计算，确保比例正确
+const CARD_HEIGHT = CARD_WIDTH * CARD_ASPECT_RATIO; 
 
 interface DeckProps {
   players: Player[];

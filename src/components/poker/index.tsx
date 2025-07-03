@@ -1,7 +1,7 @@
 import React from 'react';
 import './poker.scss';
-import { Card } from '../../types';
 import { getCardAsset, getCardBackAsset } from '../../utils/cardAssets';
+import { Card } from '../../shared-types';
 
 interface PokerProps {
   card: Card;

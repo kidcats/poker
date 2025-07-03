@@ -1,42 +1,55 @@
-import React from 'react';
-import { useDispatch } from 'react-redux';
-import { fold, check, call, raise } from '../states/gameSlice';
+// src/components/PlayerActions.tsx
 
+import React from 'react';
+
+// 定义组件接收的props类型
 interface PlayerActionsProps {
-  isPlayerTurn: boolean; // 接收一个布尔值，判断是否轮到该玩家行动
+  isMyTurn: boolean;
+  canCheck: boolean;
+  canCall: boolean;
+  callAmount: number;
+  raiseAmount: number;
+  minRaiseAmount: number;
+  maxRaiseAmount: number;
+  onFold: () => void;
+  onCheck: () => void;
+  onCall: () => void;
+  onRaise: () => void;
+  onRaiseAmountChange: (amount: number) => void;
 }
 
-const PlayerActions: React.FC<PlayerActionsProps> = ({ isPlayerTurn }) => {
-  const dispatch = useDispatch();
-
-  const handleFold = () => {
-    dispatch(fold());
-  };
-
-  const handleCheck = () => {
-    dispatch(check());
-  };
-
-  const handleCall = () => {
-    dispatch(call());
-  };
-
-  const handleRaise = () => {
-    // 暂时用一个固定的值
-    dispatch(raise(50));
-  };
-
-  // 如果不是该玩家的回合，不渲染任何东西
-  if (!isPlayerTurn) {
-    return null;
-  }
-
+const PlayerActions: React.FC<PlayerActionsProps> = ({
+  isMyTurn,
+  canCheck,
+  canCall,
+  callAmount,
+  raiseAmount,
+  minRaiseAmount,
+  maxRaiseAmount,
+  onFold,
+  onCheck,
+  onCall,
+  onRaise,
+  onRaiseAmountChange,
+}) => {
   return (
     <div className="player-actions">
-      <button onClick={handleFold}>弃牌 (Fold)</button>
-      <button onClick={handleCheck} disabled>过牌 (Check)</button>
-      <button onClick={handleCall} disabled>跟注 (Call)</button>
-      <button onClick={handleRaise} disabled>加注 (Raise)</button>
+      <button onClick={onFold} disabled={!isMyTurn}>弃牌</button>
+      <button onClick={onCheck} disabled={!canCheck}>过牌</button>
+      <button onClick={onCall} disabled={!canCall}>跟注 {canCall ? callAmount : ''}</button>
+      <div className="raise-control">
+        <button onClick={onRaise} disabled={!isMyTurn}>加注</button>
+        <input
+          type="range"
+          min={minRaiseAmount}
+          max={maxRaiseAmount}
+          step="10"
+          value={raiseAmount}
+          onChange={(e) => onRaiseAmountChange(parseInt(e.target.value, 10))}
+          disabled={!isMyTurn}
+        />
+        <span>{raiseAmount}</span>
+      </div>
     </div>
   );
 };

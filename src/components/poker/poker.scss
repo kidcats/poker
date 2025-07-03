@@ -21,6 +21,8 @@
     transform-style: preserve-3d; /* 保持3D变换效果 */
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
     border-radius: 8px; /* 给卡牌加个圆角 */
+    height: 0;
+    padding-bottom: 165%; 
 }
 
 .poker-card-face {
@@ -42,7 +44,7 @@
         // ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
         // FIX: 修复图片被裁切的问题
         // 'cover' 会填满容器但可能裁切图片，'contain' 会完整显示图片但可能留白
-        // object-fit: contain; 
+        object-fit: cover; 
         // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
     }
 }
