@@ -91,8 +91,6 @@ function App() {
   };
 
   const handleAddAI = () => {
-    // 注意：在服务器权威模型下，添加AI也应该由服务器处理
-    // 此处暂时保留，但理想情况下也应发送一个 'addAI' 消息
     sendToServer('addAI', { count: aiCount });
   };
 

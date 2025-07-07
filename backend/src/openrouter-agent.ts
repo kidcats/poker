@@ -240,23 +240,37 @@ function gameStateToAIPromptInput(gameState: GameState, playerIndex: number): AI
 // 3. 主函数 getAIPlayerAction (现已大幅简化)
 //    它只负责调用转换器，序列化，然后发送请求。
 // =================================================================================
-export async function getAIPlayerAction(gameState: GameState, playerIndex: number): Promise<PlayerAction> {
+// 函数签名现在接收 playerId: string，而不是 playerIndex: number
+export async function getAIPlayerAction(gameState: GameState, playerId: string): Promise<PlayerAction> {
+    
+    // 修改点 1: 根据传入的 playerId 查找玩家的索引 (index)
+    const playerIndex = gameState.players.findIndex(p => p.id === playerId);
+
+    // 修改点 2: 增加健壮性检查，如果找不到玩家，则直接返回弃牌
+    if (playerIndex === -1) {
+        console.error(`[AI ERROR] 致命错误: 在游戏状态中找不到ID为 "${playerId}" 的玩家。`);
+        // 即使找不到玩家，也返回一个带有正确ID的弃牌动作，以防上层逻辑出错
+        return { playerId: playerId, type: ActionType.FOLD };
+    }
+
+    // 现在我们可以安全地使用 playerIndex 获取玩家对象
     const player = gameState.players[playerIndex];
-    console.log(gameState);
+
+    // 检查API Key的逻辑保持不变
     if (!OPENROUTER_API_KEY) {
         console.error("错误: OPENROUTER_API_KEY 环境变量未设置。");
-        return { playerId: player.id, type: ActionType.FOLD};
+        return { playerId: player.id, type: ActionType.FOLD };
     }
 
     try {
-        // 步骤 1: 调用转换器，得到一个类型安全的对象
+        // 步骤 1: 调用转换器，它需要 playerIndex，我们正好已经找到了
         const aiPromptInputObject = gameStateToAIPromptInput(gameState, playerIndex);
 
-        // 步骤 2: 将该对象序列化为JSON字符串
+        // 步骤 2: 序列化为JSON字符串 (无变化)
         const userInput = JSON.stringify(aiPromptInputObject, null, 2);
-        console.log(`[AI PROMPT] Generated prompt for AI player ${player.name}:\n`, userInput);
+        console.log(`[AI PROMPT] 为AI玩家 ${player.name} 生成的提示:\n`, userInput);
 
-        // 步骤 3: 发送请求
+        // 步骤 3: 发送API请求 (无变化)
         const response = await fetch(API_URL, {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${OPENROUTER_API_KEY}`, 'Content-Type': 'application/json' },
@@ -274,17 +288,18 @@ export async function getAIPlayerAction(gameState: GameState, playerIndex: numbe
 
         if (!response.ok) {
             const errorBody = await response.text();
-            throw new Error(`API request failed with status ${response.status}: ${errorBody}`);
+            throw new Error(`API请求失败，状态码 ${response.status}: ${errorBody}`);
         }
 
         const data = await response.json();
         const aiResponseText = data.choices[0].message.content;
 
-        // 步骤 4: 解析响应 (这部分逻辑不变)
+        // 步骤 4: 解析响应 (无变化)
         return parseAIResponse(aiResponseText, player.id, gameState);
 
     } catch (error) {
-        console.error(`[AI ERROR] Error processing AI action for player ${player.name}:`, error);
+        console.error(`[AI ERROR] 处理AI玩家 ${player.name} 的行动时出错:`, error);
+        // 修改点 3: 确保返回的动作对象中包含正确的玩家ID
         return { playerId: player.id, type: ActionType.FOLD };
     }
 }

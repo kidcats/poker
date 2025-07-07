@@ -162,13 +162,13 @@ wss.on('connection', (ws: WebSocket) => {
     console.log('一个真人玩家通过WebSocket连接!');
     // 连接成功时，立即发送当前游戏状态
     const initialState = JSON.parse(JSON.stringify(authoritativeGameState));
-    initialState.players.forEach((p: Player) => { if(p.isAI) p.hand = []; });
+    initialState.players.forEach((p: Player) => { if(p.isAI) p.hand = []; }); // 遍历手牌，如果是ai则清空
     ws.send(JSON.stringify({ type: 'gameStateUpdate', payload: initialState }));
 
     ws.on('message', (message: string) => {
         try {
             const data = JSON.parse(message);
-            
+            console.log(`收到来自玩家的WebSocket消息:`, data);
             // MODIFIED: 简化逻辑，将currentPlayer的获取放在需要的地方
             switch (data.type) {
                 case 'joinGame':
@@ -196,6 +196,7 @@ wss.on('connection', (ws: WebSocket) => {
                     broadcastGameState();
                     break;
                 }
+            console.log("处理WebSocket消息成功,处理后的游戏状态", authoritativeGameState);
         } catch (error) {
             console.error("处理WebSocket消息时出错:", error);
         }

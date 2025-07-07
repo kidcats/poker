@@ -122,49 +122,91 @@ export const addAIPlayers = (state: GameState, payload: { count: number }): Game
     return newState;
 };
 const assignPlayerPositions = (players: Player[], dealerIndex: number, sbIndex: number, bbIndex: number): Player[] => {
-    const activePlayers = players.filter(p => p.status !== PlayerStatus.SITTING_OUT);
-    const numPlayers = activePlayers.length;
+    // 1. 基础准备：重置位置，获取活跃玩家数量
+    players.forEach(p => p.position = '');
+    const activePlayersCount = players.filter(p => p.status !== PlayerStatus.SITTING_OUT).length;
 
-    players.forEach(p => p.position = ''); // MODIFIED: 使用空字符串代替undefined
-
-    if (numPlayers < 2) return players;
-
-    const positionNames: { [key: number]: string[] } = {
-        2: [], 3: ["BTN"], 4: ["UTG", "BTN"], 5: ["UTG", "MP", "BTN"],
-        6: ["UTG", "MP", "CO", "BTN"], 7: ["UTG", "UTG+1", "MP", "CO", "BTN"],
-        8: ["UTG", "UTG+1", "MP", "MP+1", "CO", "BTN"],
-        9: ["UTG", "UTG+1", "UTG+2", "MP", "MP+1", "CO", "BTN"],
-        10: ["UTG", "UTG+1", "UTG+2", "MP", "MP+1", "MP+2", "CO", "BTN"],
-    };
-
-    const positionsToAssign = positionNames[numPlayers] || positionNames[10];
-    let currentPosIndex = 0;
-    
-    let currentPlayerIndex = findNextPlayerForTurn(players, bbIndex)!;
-
-    while(currentPosIndex < positionsToAssign.length) {
-        if (currentPlayerIndex === dealerIndex || currentPlayerIndex === sbIndex || currentPlayerIndex === bbIndex) {
-            // Skip blind/button positions for now
-        } else {
-            players[currentPlayerIndex].position = positionsToAssign[currentPosIndex];
-            currentPosIndex++;
-        }
-        currentPlayerIndex = findNextPlayerForTurn(players, currentPlayerIndex)!;
-        if (currentPlayerIndex === findNextPlayerForTurn(players, bbIndex)!) break; // Full circle
+    if (activePlayersCount < 2) {
+        return players;
     }
 
+    // 2. 分配核心位置：BTN, SB, BB
     players[dealerIndex].position = "BTN";
     players[sbIndex].position = "SB";
     players[bbIndex].position = "BB";
 
-    if (numPlayers === 2) {
-        players[dealerIndex].position = "BTN / SB";
+    // 3. 处理特殊情况：2人桌 (Heads-Up)
+    if (activePlayersCount === 2) {
+        players[dealerIndex].position = "BTN / SB"; // 庄家也是小盲
+        return players;
+    }
+
+    // === 动态算法核心部分 ===
+
+    // 4. 收集所有需要分配位置的玩家 (从UTG到CO)
+    const playersToAssignPosition: number[] = [];
+    // 使用我们之前验证过的优秀函数 findNextPlayerForTurn
+    let currentIndex = findNextPlayerForTurn(players, bbIndex)!; 
+
+    // 顺时针遍历，直到回到庄家为止
+    while (currentIndex !== dealerIndex) {
+        // 确保不重复添加SB和BB（在某些极少人数情况下可能发生）
+        if (currentIndex !== sbIndex && currentIndex !== bbIndex) {
+            playersToAssignPosition.push(currentIndex);
+        }
+        currentIndex = findNextPlayerForTurn(players, currentIndex)!;
+        
+        // 安全退出，防止因意外逻辑导致的无限循环
+        if (currentIndex === null || playersToAssignPosition.length >= activePlayersCount) {
+            break;
+        }
+    }
+
+    const positionsToAssignCount = playersToAssignPosition.length;
+    if (positionsToAssignCount === 0) {
+        // 3人桌的情况，只有BTN, SB, BB，无需额外分配
+        return players;
+    }
+
+    // 5. 动态生成位置名称列表
+    const positionNames: string[] = [];
+    if (positionsToAssignCount === 1) { // 4人桌
+        positionNames.push("UTG");
+    } else if (positionsToAssignCount === 2) { // 5人桌
+        positionNames.push("UTG", "CO");
+    } else if (positionsToAssignCount === 3) { // 6人桌
+        positionNames.push("UTG", "MP", "CO");
+    } else if (positionsToAssignCount >= 4) { // 7人桌及以上
+        positionNames.push("UTG"); // 第一个永远是UTG
+        
+        // 填充UTG+n
+        const utgPlusCount = Math.min(2, positionsToAssignCount - 3); // 在7-8人桌有一个UTG+1, 9人桌及以上有UTG+1, UTG+2
+        for (let i = 1; i <= utgPlusCount; i++) {
+            positionNames.push(`UTG+${i}`);
+        }
+
+        // 填充MP
+        const mpCount = positionsToAssignCount - (positionNames.length + 2); // 减去已有的UTG系列和末尾的HJ,CO
+        for (let i = 1; i <= mpCount; i++) {
+            positionNames.push(`MP${i}`);
+        }
+
+        positionNames.push("HJ"); // 倒数第二个是Hijack
+        positionNames.push("CO"); // 最后一个是Cutoff
+    }
+
+    // 6. 将生成的位置名称分配给玩家
+    for (let i = 0; i < positionsToAssignCount; i++) {
+        const playerIndex = playersToAssignPosition[i];
+        const positionName = positionNames[i];
+        if (playerIndex !== undefined && positionName) {
+            players[playerIndex].position = positionName;
+        }
     }
     
     return players;
 };
 
-// ... internalLogic (无变化)
 const internalLogic = {
     handleShowdown: (state: GameState): GameState => {
         let newState = deepClone(state);
@@ -269,6 +311,9 @@ export const addPlayer = (state: GameState, payload: { id: string, name: string,
     return newState;
 };
 
+/// 我有一个问题，当用户的位置信息是什么时候确认的？是游戏开始的时候吗？
+/// 如果用户是半路加入的呢？一般是大盲位置，其他人的位置是否需要计算？
+/// 如何合理的计算用户的位置呢？
 export const startGame = (state: GameState): GameState => {
     let newState = deepClone(state);
     
