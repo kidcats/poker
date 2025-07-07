@@ -1,6 +1,4 @@
-// backend/src/game-engine.ts
-
-import { GameState, Player, Card, GamePhase, Suit, Rank, PlayerStatus, HandType, HandResult, PlayerAction, ActionType } from '../../src/shared-types';
+import { GameState, Player, Card, GamePhase, Suit, Rank, PlayerStatus, HandType, HandResult, PlayerAction, ActionType, ActionLog, ShowdownResult } from '../../src/shared-types';
 
 // ========================================================================
 // ==                           常量和辅助函数                         ==
@@ -11,6 +9,7 @@ const BIG_BLIND_AMOUNT = 20;
 // 创建一个深拷贝的辅助函数，确保函数纯净，不修改原始状态
 const deepClone = <T>(obj: T): T => JSON.parse(JSON.stringify(obj));
 
+// 牌力评估等辅助函数 (无变化)
 const evaluateHand = (allCards: Card[]): HandResult => {
     const sortedCards = [...allCards].sort((a, b) => b.rank - a.rank);
     const flushSuit: { [key in Suit]?: Card[] } = {};
@@ -100,12 +99,6 @@ const findNextPlayerForTurn = (players: Player[], startIndex: number): number | 
     }
     return null;
 };
-/**
- * 添加指定数量的AI玩家
- * @param state 当前游戏状态
- * @param payload 包含要添加数量的对象 { count: number }
- * @returns 更新后的游戏状态
- */
 export const addAIPlayers = (state: GameState, payload: { count: number }): GameState => {
     if (state.gamePhase !== GamePhase.WAITING) return state;
     let newState = deepClone(state);
@@ -117,46 +110,28 @@ export const addAIPlayers = (state: GameState, payload: { count: number }): Game
         const newAIPlayer: Player = {
             id: `ai-${Date.now()}-${i}`,
             name: `AI Bot ${aiIndex}`,
-            stack: 1000, // 默认筹码
+            stack: 1000,
             isAI: true,
             hand: [],
             currentRoundBet: 0,
             status: PlayerStatus.WAITING,
+            position: '', // MODIFIED: 确保新AI玩家有position属性
         };
         newState.players.push(newAIPlayer);
     }
     return newState;
 };
-
-// ========================================================================
-// ==                      新增的位置分配核心逻辑                      ==
-// ========================================================================
-/**
- * 根据玩家人数和庄家位置，为每个活跃玩家分配德州扑克中的标准位置名称。
- * @param players 玩家数组
- * @param dealerIndex 庄家按钮所在玩家的索引
- * @param sbIndex 小盲注玩家的索引
- * @param bbIndex 大盲注玩家的索引
- * @returns 更新了 position 字段的玩家数组
- */
 const assignPlayerPositions = (players: Player[], dealerIndex: number, sbIndex: number, bbIndex: number): Player[] => {
     const activePlayers = players.filter(p => p.status !== PlayerStatus.SITTING_OUT);
     const numPlayers = activePlayers.length;
 
-    // 清空上一局的位置信息
-    players.forEach(p => p.position = undefined);
+    players.forEach(p => p.position = ''); // MODIFIED: 使用空字符串代替undefined
 
     if (numPlayers < 2) return players;
 
-    // 定义不同人数下的位置顺序 (从枪口位开始)
-    // 这是标准的扑克位置命名法
     const positionNames: { [key: number]: string[] } = {
-        2: [], // Heads-up: 只有 SB/BTN 和 BB
-        3: ["BTN"],
-        4: ["UTG", "BTN"],
-        5: ["UTG", "MP", "BTN"],
-        6: ["UTG", "MP", "CO", "BTN"],
-        7: ["UTG", "UTG+1", "MP", "CO", "BTN"],
+        2: [], 3: ["BTN"], 4: ["UTG", "BTN"], 5: ["UTG", "MP", "BTN"],
+        6: ["UTG", "MP", "CO", "BTN"], 7: ["UTG", "UTG+1", "MP", "CO", "BTN"],
         8: ["UTG", "UTG+1", "MP", "MP+1", "CO", "BTN"],
         9: ["UTG", "UTG+1", "UTG+2", "MP", "MP+1", "CO", "BTN"],
         10: ["UTG", "UTG+1", "UTG+2", "MP", "MP+1", "MP+2", "CO", "BTN"],
@@ -165,36 +140,31 @@ const assignPlayerPositions = (players: Player[], dealerIndex: number, sbIndex: 
     const positionsToAssign = positionNames[numPlayers] || positionNames[10];
     let currentPosIndex = 0;
     
-    // 从大盲位之后开始分配位置
     let currentPlayerIndex = findNextPlayerForTurn(players, bbIndex)!;
 
     while(currentPosIndex < positionsToAssign.length) {
-        if (currentPlayerIndex === dealerIndex) {
-            players[currentPlayerIndex].position = "BTN";
+        if (currentPlayerIndex === dealerIndex || currentPlayerIndex === sbIndex || currentPlayerIndex === bbIndex) {
+            // Skip blind/button positions for now
         } else {
             players[currentPlayerIndex].position = positionsToAssign[currentPosIndex];
             currentPosIndex++;
         }
         currentPlayerIndex = findNextPlayerForTurn(players, currentPlayerIndex)!;
+        if (currentPlayerIndex === findNextPlayerForTurn(players, bbIndex)!) break; // Full circle
     }
 
-    // 最后，直接设置大小盲和庄家位 (可能会覆盖上面的BTN，确保准确)
     players[dealerIndex].position = "BTN";
     players[sbIndex].position = "SB";
     players[bbIndex].position = "BB";
 
-    // 特殊处理两人局 (Heads-Up)
     if (numPlayers === 2) {
-        players[dealerIndex].position = "BTN / SB"; // 庄家也是小盲
+        players[dealerIndex].position = "BTN / SB";
     }
     
     return players;
 };
-// ========================================================================
-// ==                内部游戏流程控制函数 (不对外暴露)                 ==
-// ========================================================================
 
-// 将所有内部逻辑函数组织起来，方便互相调用
+// ... internalLogic (无变化)
 const internalLogic = {
     handleShowdown: (state: GameState): GameState => {
         let newState = deepClone(state);
@@ -288,12 +258,13 @@ export const createInitialState = (): GameState => ({
     players: [], deck: [], communityCards: [], pot: 0, gamePhase: GamePhase.WAITING,
     currentPlayerIndex: null, dealerIndex: -1, smallBlindIndex: null, bigBlindIndex: null,
     currentRoundBet: 0, lastRaiserIndex: null, minRaiseAmount: 0, gameId: null, showdownResults: null,
+    actionHistory: [], // NEW: 初始化 actionHistory
 });
 
 export const addPlayer = (state: GameState, payload: { id: string, name: string, stack: number, isAI: boolean }): GameState => {
     if (state.gamePhase !== GamePhase.WAITING) return state;
     const newState = deepClone(state);
-    const newPlayer: Player = { ...payload, hand: [], currentRoundBet: 0, status: PlayerStatus.WAITING };
+    const newPlayer: Player = { ...payload, hand: [], currentRoundBet: 0, status: PlayerStatus.WAITING, position: '' }; // MODIFIED: 添加 position
     newState.players.push(newPlayer);
     return newState;
 };
@@ -310,33 +281,34 @@ export const startGame = (state: GameState): GameState => {
 
     // 2. 重置游戏状态和玩家状态
     newState.showdownResults = null;
-    newState.gamePhase = GamePhase.PRE_DEAL; // 设置为准备阶段
+    newState.gamePhase = GamePhase.PRE_DEAL;
     newState.gameId = `game-${Date.now()}`;
     newState.communityCards = [];
     newState.pot = 0;
     newState.currentRoundBet = 0;
+    newState.actionHistory = []; // NEW: 每局开始时清空历史记录
     newState.players.forEach(p => {
         p.hand = [];
         p.currentRoundBet = 0;
         p.status = p.stack > 0 ? PlayerStatus.ACTIVE : PlayerStatus.SITTING_OUT;
-        p.position = undefined; // 清空上一局的位置
+        p.position = ''; // MODIFIED: 使用空字符串代替undefined
     });
 
-    // 3. 创建并洗牌
+    // 3. 创建并洗牌 (无变化)
     newState.deck = [];
     const suits = Object.values(Suit);
     const ranks = Object.values(Rank).filter(r => typeof r === 'number') as Rank[];
     for (const suit of suits) { for (const rank of ranks) { newState.deck.push({ suit, rank }); } }
     for (let i = newState.deck.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [newState.deck[i], newState.deck[j]] = [newState.deck[j], newState.deck[i]]; }
     
-    // 4. 确定庄家(BTN)和盲注(SB, BB)的索引
+    // 4. 确定庄家(BTN)和盲注(SB, BB)的索引 (无变化)
     newState.dealerIndex = findNextPlayerForTurn(newState.players, newState.dealerIndex) ?? 0;
     const sbIndex = findNextPlayerForTurn(newState.players, newState.dealerIndex)!;
     const bbIndex = findNextPlayerForTurn(newState.players, sbIndex)!;
     newState.smallBlindIndex = sbIndex;
     newState.bigBlindIndex = bbIndex;
     
-    // 5. 【关键步骤】分配所有玩家的位置名称
+    // 5. 分配所有玩家的位置名称 (无变化)
     assignPlayerPositions(newState.players, newState.dealerIndex, sbIndex, bbIndex);
     
     // 6. 强制下盲注
@@ -344,17 +316,21 @@ export const startGame = (state: GameState): GameState => {
     const sbBet = Math.min(SMALL_BLIND_AMOUNT, sbPlayer.stack);
     sbPlayer.stack -= sbBet; sbPlayer.currentRoundBet = sbBet; newState.pot += sbBet;
     if (sbPlayer.stack === 0) sbPlayer.status = PlayerStatus.ALL_IN;
-    
+    // NEW: 记录小盲注行动
+    newState.actionHistory.push({ playerId: sbPlayer.id, action: 'SB', amount: sbBet, stage: newState.gamePhase });
+
     const bbPlayer = newState.players[bbIndex];
     const bbBet = Math.min(BIG_BLIND_AMOUNT, bbPlayer.stack);
     bbPlayer.stack -= bbBet; bbPlayer.currentRoundBet = bbBet; newState.pot += bbBet;
     if (bbPlayer.stack === 0) bbPlayer.status = PlayerStatus.ALL_IN;
-    
-    // 7. 设置翻前轮的下注状态
+    // NEW: 记录大盲注行动
+    newState.actionHistory.push({ playerId: bbPlayer.id, action: 'BB', amount: bbBet, stage: newState.gamePhase });
+
+    // 7. 设置翻前轮的下注状态 (无变化)
     newState.currentRoundBet = BIG_BLIND_AMOUNT;
     newState.minRaiseAmount = BIG_BLIND_AMOUNT * 2;
     
-    // 8. 发两张底牌给每个活跃玩家
+    // 8. 发两张底牌给每个活跃玩家 (无变化)
     for (let i = 0; i < 2; i++) {
         for (const player of newState.players) {
             if (player.status !== PlayerStatus.SITTING_OUT) {
@@ -363,10 +339,10 @@ export const startGame = (state: GameState): GameState => {
         }
     }
     
-    // 9. 设置游戏阶段为翻前，并确定第一个行动者
+    // 9. 设置游戏阶段为翻前，并确定第一个行动者 (无变化)
     newState.gamePhase = GamePhase.PRE_FLOP;
     newState.currentPlayerIndex = findNextActivePlayer(newState.players, bbIndex)!;
-    newState.lastRaiserIndex = newState.currentPlayerIndex; // 第一个行动者也是“最后一个加注者”
+    newState.lastRaiserIndex = newState.currentPlayerIndex;
     
     // 10. 返回全新的游戏状态
     return newState;
@@ -384,6 +360,8 @@ export const processPlayerAction = (state: GameState, action: PlayerAction): Gam
     switch (action.type) {
         case ActionType.FOLD:
             player.status = PlayerStatus.FOLDED;
+            // NEW: 记录弃牌行动
+            newState.actionHistory.push({ playerId: player.id, action: 'FOLD', amount: 0, stage: newState.gamePhase });
             return internalLogic.advanceAction(newState);
 
         case ActionType.CHECK:
@@ -391,19 +369,23 @@ export const processPlayerAction = (state: GameState, action: PlayerAction): Gam
                 console.warn(`非法行动: 玩家 ${player.name} 不能check，需要跟注。`);
                 return state;
             }
+            // NEW: 记录过牌行动
+            newState.actionHistory.push({ playerId: player.id, action: 'CHECK', amount: 0, stage: newState.gamePhase });
             return internalLogic.advanceAction(newState);
 
         case ActionType.CALL:
             const amountToCall = newState.currentRoundBet - player.currentRoundBet;
             if (amountToCall <= 0) {
                 console.warn(`非法行动: 玩家 ${player.name} 无需跟注。`);
-                return state; // 或者可以视为check
+                return state;
             }
             const betAmount = Math.min(amountToCall, player.stack);
             player.stack -= betAmount;
             player.currentRoundBet += betAmount;
             newState.pot += betAmount;
             if (player.stack === 0) player.status = PlayerStatus.ALL_IN;
+            // NEW: 记录跟注行动
+            newState.actionHistory.push({ playerId: player.id, action: 'CALL', amount: player.currentRoundBet, stage: newState.gamePhase });
             return internalLogic.advanceAction(newState);
 
         case ActionType.RAISE:
@@ -423,6 +405,8 @@ export const processPlayerAction = (state: GameState, action: PlayerAction): Gam
             newState.minRaiseAmount = newState.currentRoundBet + (newState.currentRoundBet - oldRoundBet);
             newState.lastRaiserIndex = newState.currentPlayerIndex;
             if (player.stack === 0) player.status = PlayerStatus.ALL_IN;
+            // NEW: 记录加注行动
+            newState.actionHistory.push({ playerId: player.id, action: 'RAISE', amount: finalRaiseAmount, stage: newState.gamePhase });
             return internalLogic.advanceAction(newState);
     }
     return state;

@@ -35,7 +35,7 @@ const Deck: React.FC<DeckProps> = ({ players, communityCards, ownPlayerId, gameP
     if (!gameId) return [];
 
     const cards: {
-      card: Card;
+      card: Card | null;
       ownerId: string;
       type: 'hand' | 'community';
       cardIndex: number;
@@ -43,20 +43,30 @@ const Deck: React.FC<DeckProps> = ({ players, communityCards, ownPlayerId, gameP
     }[] = [];
 
     players.forEach((player) => {
-      player.hand.forEach((card, handIndex) => {
-        cards.push({ 
-          card, 
-          ownerId: player.id, 
-          type: 'hand', 
-          cardIndex: handIndex, 
-          // ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
-          // THE DEFINITIVE FIX: 使用 gameId 构建稳定且唯一的 key
-          uniqueKey: `${gameId}-${player.id}-${handIndex}`
-          // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+      // 如果是AI或者其他玩家，并且手牌为空 (被服务器隐藏了)，但游戏正在进行中
+      if (player.id !== ownPlayerId && player.hand.length === 0 && gamePhase > GamePhase.PRE_DEAL && gamePhase < GamePhase.SHOWDOWN) {
+        for (let i = 0; i < 2; i++) {
+          cards.push({
+            card: null, // card 为 null 代表这是一张牌背
+            ownerId: player.id,
+            type: 'hand',
+            cardIndex: i,
+            uniqueKey: `${gameId}-${player.id}-${i}` // 使用稳定的key
+          });
+        }
+      } else {
+        // 对于真人玩家，或者摊牌阶段的AI，正常处理手牌
+        player.hand.forEach((card, handIndex) => {
+          cards.push({
+            card,
+            ownerId: player.id,
+            type: 'hand',
+            cardIndex: handIndex,
+            uniqueKey: `${gameId}-${player.id}-${handIndex}`
+          });
         });
-      });
+      }
     });
-
     communityCards.forEach((card, index) => {
       cards.push({ 
         card, 
@@ -71,7 +81,7 @@ const Deck: React.FC<DeckProps> = ({ players, communityCards, ownPlayerId, gameP
     });
 
     return cards;
-  }, [players, communityCards, gameId]); // <-- 将 gameId 加入依赖项
+  }, [players, communityCards, gameId,gamePhase,ownPlayerId]); // <-- 将 gameId 加入依赖项
 
   // ... (useSprings 和 useEffect 逻辑完全不变)
   const [springs, api] = useSprings(allCards.length, index => ({
@@ -109,7 +119,7 @@ const Deck: React.FC<DeckProps> = ({ players, communityCards, ownPlayerId, gameP
         if (!cardInfo) return null;
         const isShowdown = gamePhase >= GamePhase.SHOWDOWN;
         const isPlayerInShowdown = !!(isShowdown && players.find(p => p.id === cardInfo.ownerId && p.status !== PlayerStatus.FOLDED));
-        const isFlipped = cardInfo.type === 'community' || cardInfo.ownerId === ownPlayerId || isPlayerInShowdown;
+        const isFlipped = cardInfo.card !== null && (cardInfo.type === 'community' || cardInfo.ownerId === ownPlayerId || isPlayerInShowdown);
         return (
           <animated.div
             key={cardInfo.uniqueKey}

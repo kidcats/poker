@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './App.css';
+import './App.scss';
 import { PositionProvider } from './states/positionContext';
 import { selectGame, setGameState } from './states/gameSlice';
 import { GamePhase, PlayerStatus, ActionType } from './shared-types';
@@ -30,7 +30,7 @@ function App() {
   const callAmount = gameState.currentRoundBet - (ownPlayer?.currentRoundBet || 0);
 
   // ========================================================================
-  // ==                      核心副作用 Hooks                           ==
+  // ==                      核心副作用 Hooks                                ==
   // ========================================================================
 
   // 核心 Effect 1: 建立并维护WebSocket连接
@@ -123,6 +123,11 @@ function App() {
       alert("无效的加注金额！");
     }
   };
+  const handleRequestNewGame = () => {
+    // 我们不再直接发送 'startGame'，而是发送一个更明确的指令
+    // 告诉服务器：“这局结束了，请把我们带回大厅（WAITING状态）”
+    sendToServer('resetGame', {});
+  };
 
   // ========================================================================
   // ==                         UI 渲染部分                              ==
@@ -148,7 +153,7 @@ function App() {
                 </div>
               ))}
               {/* 这个按钮现在会开始一个由服务器控制的新游戏循环 */}
-              <button onClick={handleStartGame} className="new-game-button">
+              <button onClick={handleRequestNewGame} className="new-game-button">
                 开始新游戏
               </button>
             </div>

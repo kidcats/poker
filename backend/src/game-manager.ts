@@ -1,6 +1,8 @@
 // 这是一个简化的游戏状态管理器示例
 // 在一个真实的项目中，您会把 gameSlice.ts 的逻辑完整地移到这里
-import { GameState } from '../../src/types'; // 假设类型文件可以共享
+// import { GameState } from '../../src/types'; // 假设类型文件可以共享
+
+import { GameState } from "../../src/shared-types";
 
 let currentGameState: GameState | null = null;
 

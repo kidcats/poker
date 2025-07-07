@@ -33,7 +33,7 @@ export interface Player {
   currentRoundBet: number;
   status: PlayerStatus;
   isAI: boolean;
-  position?: string;
+  position?: string; // 位置标识符，例如 "SB", "BB", "UTG" 等
 }
 
 export enum GamePhase {
@@ -70,14 +70,30 @@ export interface GameState {
   minRaiseAmount: number;
   gameId: string | null;
   showdownResults: ShowdownResult[] | null;
+  actionHistory: ActionLog[]; // 用于记录每个行动的日志
 }
 
 // ========================================================================
 // ==                      共享的行动类型 (无变化)                       ==
 // ========================================================================
 export enum ActionType {
-    FOLD, CHECK, CALL, RAISE
+    FOLD, CHECK, CALL, RAISE, ACTIVE
 }
+
+
+///
+// ========================================================================
+// ==                      给ai用的                   ==
+// ========================================================================
+
+export interface ActionLog {
+  playerId: string;
+  action: 'FOLD' | 'CHECK' | 'CALL' | 'RAISE' | 'SB' | 'BB'; // 用大写字符串以匹配Prompt
+  amount: number;
+  stage: GamePhase;
+}
+
+
 export interface BasePlayerAction { playerId: string; }
 export interface FoldAction extends BasePlayerAction { type: ActionType.FOLD; }
 export interface CheckAction extends BasePlayerAction { type: ActionType.CHECK; }
