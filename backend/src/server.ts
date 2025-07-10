@@ -118,7 +118,7 @@ async function checkAndTriggerNextStep() {
         // 如果当前玩家是AI且处于活跃状态
         if (currentPlayer.isAI && currentPlayer.status === PlayerStatus.ACTIVE) { // MODIFIED: 增加状态检查
             // 添加一个短暂的延迟，让游戏节奏更自然
-            await new Promise(resolve => setTimeout(resolve, 1500)); 
+            await new Promise(resolve => setTimeout(resolve, 500)); 
 
             console.log(`服务器主动为AI [${currentPlayer.name}] 请求行动...`);
             try {

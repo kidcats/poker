@@ -1,46 +1,44 @@
+// src/components/table/table.scss (修改后)
+
 @import '../variables.scss';
-@import '../minins.scss';
+// 修正：您可能写成了 minins.scss，通常是 mixins.scss
+@import '../minins.scss'; 
 
 .game-page__table {
-  display: flex;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  max-width: 70em;
-  width: 60%;
+  // 1. 不再使用 flexbox。它现在只是一个定位的容器。
+  position: relative; // 改为 relative，让绝对定位的子元素相对于它
+  margin: 2rem auto;   // 页面居中
+  max-width: 1200px;
+  width: 90vw;         // 使用视口单位，更具响应性
+  aspect-ratio: 2 / 1; // 保持桌子的椭圆比例
 
-  animation: fadeIn;
-  animation-duration: 0.4s;
+  animation: fadeIn 0.4s;
   transition: width 1s ease;
+}
 
-  @include for-desktop {
-    width: 50%;
-  }
+.table__rail {
+  // 2. 桌子的视觉部分使用绝对定位撑满父容器
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  border-radius: 100em;
 
-  .table__rail {
-    flex-grow: 1;
-    aspect-ratio: 2 / 1;
+  background-image: url('../../assets/table_frame_pattern.png');
+  box-shadow: inset 0 0.32em 0.61em -0.32em $gray;
+}
 
-    border-radius: 40%/80%;
+.table__felt {
+  position: absolute;
+  width: 95%;   // 宽度是父容器的95%
+  height: 90%;  // 高度是父容器的90%
+  top: 5%;      // 上下各有5%的边距
+  left: 2.5%;   // 左右各有2.5%的边距
+  border-radius: 100em;
 
-    background-image: url('../../assets/table_frame_pattern.png');
-    box-shadow: inset 0 0.32em 0.61em -0.32em $gray;
-  }
-
-  .table__felt {
-    flex-grow: 1;
-    position: absolute;
-    top: 5%;
-    left: 2.5%;
-    aspect-ratio: 21 / 10;
-    width: 95%;
-
-    border-radius: 40%/80%;
-
-    background-image: url('../../assets/table_pattern.png');
-    background-size: 100% 100%;
-    background-color: $sea;
-    box-shadow: inset 0 0.12rem 0.32rem 0.32rem $shadow-black;
-  }
+  background-image: url('../../assets/table_pattern.png');
+  background-size: cover;
+  background-color: $sea;
+  box-shadow: inset 0 0.12rem 0.32rem 0.32rem $shadow-black;
 }

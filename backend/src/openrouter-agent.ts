@@ -275,7 +275,7 @@ export async function getAIPlayerAction(gameState: GameState, playerId: string):
             method: 'POST',
             headers: { 'Authorization': `Bearer ${OPENROUTER_API_KEY}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                model: "openai/gpt-4o",
+                model: "deepseek/deepseek-chat-v3-0324",
                 messages: [
                     { role: "system", content: SYSTEM_PROMPT },
                     { role: "user", content: userInput }

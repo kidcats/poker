@@ -8,7 +8,7 @@
     // 当这个容器有 .is-flipped 类时，内部卡片进行Y轴翻转
     &.is-flipped {
         .poker-card-inner {
-            transform: rotateY(180deg);
+            // transform: rotateY(180deg);
         }
     }
 }
@@ -29,32 +29,12 @@
     position: absolute;
     width: 100%;
     height: 100%;
-    -webkit-backface-visibility: hidden; /* Safari */
-    backface-visibility: hidden; /* 隐藏元素的背面 */
     border-radius: 8px;
-    overflow: hidden;
     
-    // 添加一个背景色，防止图片因比例问题留白时露出透明背景
-    background-color: white;
 
     img {
         width: 100%;
         height: 100%;
-        
-        // ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
-        // FIX: 修复图片被裁切的问题
-        // 'cover' 会填满容器但可能裁切图片，'contain' 会完整显示图片但可能留白
         object-fit: cover; 
-        // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
     }
-}
-
-// 卡牌正面，初始时是转过去的
-.poker-card-front {
-    transform: rotateY(180deg);
-}
-
-// 卡牌背面
-.poker-card-back {
-    // 可以在这里为牌背添加特定的样式
 }

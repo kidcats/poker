@@ -32,6 +32,7 @@ const PlayerActions: React.FC<PlayerActionsProps> = ({
   onRaise,
   onRaiseAmountChange,
 }) => {
+  console.log('PlayerActions props:isMyTurn:', isMyTurn, 'canCheck:', canCheck, 'canCall:', canCall, 'callAmount:', callAmount, 'raiseAmount:', raiseAmount, 'minRaiseAmount:', minRaiseAmount, 'maxRaiseAmount:', maxRaiseAmount);
   return (
     <div className="player-actions">
       <button onClick={onFold} disabled={!isMyTurn}>弃牌</button>
